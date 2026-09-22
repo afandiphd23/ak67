@@ -98,6 +98,8 @@ function Shell() {
       const target = e.target as HTMLElement | null
       const typing =
         target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+      // The cross-reference preview modal handles ← → itself while open.
+      const modalOpen = document.body.dataset.xrefModal === '1'
 
       if (e.key === '/' && !typing) {
         e.preventDefault()
@@ -106,7 +108,7 @@ function Shell() {
       } else if (e.key === 'Escape') {
         if (typing) (target as HTMLInputElement).blur()
         setQuery('')
-      } else if (!typing && selected) {
+      } else if (!typing && !modalOpen && selected) {
         if (e.key === 'ArrowLeft') goPrev()
         else if (e.key === 'ArrowRight') goNext()
       }

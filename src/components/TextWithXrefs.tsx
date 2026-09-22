@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { bmSection, findSection, sectionByNumber } from '../data'
+import { allSections, bmSection, findSection, sectionByNumber } from '../data'
 import type { FlatSection } from '../data'
 import { UI, useLang } from '../i18n'
 import { SectionBody } from './SectionBody'
@@ -136,7 +136,13 @@ export function TextWithXrefs({ text }: { text: string }) {
           }}
         />
       )}
-      {modalId && <XrefModal id={modalId} onClose={() => setModalId(null)} />}
+      {modalId && (
+        <XrefModal
+          id={modalId}
+          onClose={() => setModalId(null)}
+          onNavigate={setModalId}
+        />
+      )}
     </>
   )
 }
@@ -186,28 +192,56 @@ function XrefPreview({
 }
 
 /** Compact full-text preview of a section, shown over the page. */
-function XrefModal({ id, onClose }: { id: string; onClose: () => void }) {
+function XrefModal({
+  id,
+  onClose,
+  onNavigate,
+}: {
+  id: string
+  onClose: () => void
+  onNavigate: (id: string) => void
+}) {
   const { lang } = useLang()
   const t = UI[lang]
   const section = findSection(id)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
 
+  const idx = allSections.findIndex((s) => s.id === id)
+  const prev = idx > 0 ? allSections[idx - 1] : undefined
+  const next = idx >= 0 && idx < allSections.length - 1 ? allSections[idx + 1] : undefined
+
+  // Mount-only: pause the app's global shortcuts, lock scroll, focus the dialog.
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    // Navigating (link, back/forward, "open full") always closes the preview.
-    window.addEventListener('keydown', onKey)
-    window.addEventListener('hashchange', onClose)
+    document.body.dataset.xrefModal = '1'
     closeRef.current?.focus()
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
-      window.removeEventListener('keydown', onKey)
-      window.removeEventListener('hashchange', onClose)
+      delete document.body.dataset.xrefModal
       document.body.style.overflow = prevOverflow
     }
-  }, [onClose])
+  }, [])
+
+  // New section in the modal: start scrolled to its top.
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: 0 })
+  }, [id])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      else if (e.key === 'ArrowLeft' && prev) onNavigate(prev.id)
+      else if (e.key === 'ArrowRight' && next) onNavigate(next.id)
+    }
+    // Navigating (link, back/forward, "open full") always closes the preview.
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('hashchange', onClose)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('hashchange', onClose)
+    }
+  }, [onClose, onNavigate, prev, next])
 
   if (!section) return null
   const bm = lang === 'bm' ? bmSection(section.id) : undefined
@@ -254,10 +288,36 @@ function XrefModal({ id, onClose }: { id: string; onClose: () => void }) {
             ✕
           </button>
         </div>
-        <div className="xref-modal-body">
+        <div className="xref-modal-body" ref={bodyRef}>
           <SectionBody section={loc} lang={lang} />
         </div>
         <div className="xref-modal-actions">
+          <div className="xref-modal-pager">
+            {prev ? (
+              <button
+                className="pager-btn"
+                onClick={() => onNavigate(prev.id)}
+                title={t.prevSection}
+                aria-label={t.prevSection}
+              >
+                ← {prev.number}
+              </button>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <button
+                className="pager-btn"
+                onClick={() => onNavigate(next.id)}
+                title={t.nextSection}
+                aria-label={t.nextSection}
+              >
+                {next.number} →
+              </button>
+            ) : (
+              <span />
+            )}
+          </div>
           <button className="btn" onClick={openFull}>
             {t.previewOpenFull}
           </button>

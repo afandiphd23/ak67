@@ -57,7 +57,16 @@ function Shell() {
               </button>
             </div>
           </div>
-          <p>{t.brandSub}</p>
+          <p>
+            {t.brandSub} ·{' '}
+            <a
+              className="creator-link"
+              href={`mailto:${t.creatorEmail}`}
+              title={t.creatorTitle}
+            >
+              {t.creatorLabel}
+            </a>
+          </p>
         </div>
 
         <div className="search-box">

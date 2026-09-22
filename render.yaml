@@ -1,10 +1,9 @@
 # Render Blueprint — deploy the Customs Act 1967 app as a static site.
-# The app lives in the customs-act-app/ subfolder of this repo, hence rootDir.
+# The repo root IS the app (package.json lives at the repo root), so no rootDir.
 services:
   - type: web
     name: ak67
     runtime: static
-    rootDir: customs-act-app
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
     # Relative base ('./') in vite.config.ts makes the build work from any path.

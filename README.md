@@ -17,6 +17,10 @@ By **Dr.Fendi Ameen** · [afandi.amin@customs.gov.my](mailto:afandi.amin@customs
 - **Full Act, both languages** — every section translated to Bahasa Melayu, with a one-click language toggle (EN ⇄ BM). Sections without a translation fall back to English automatically.
 - **Browse by PART** — collapsible sidebar groups all parts (BAHAGIAN I–XVII) with localized part titles.
 - **Full-text search** — case-insensitive search across section numbers, headings, and body text, with instant results.
+- **Shareable links** — every section has its own URL (`#s-15`), so you can bookmark or share links; browser back/forward works.
+- **Bookmarks** — star any section (☆ → ★) and it appears in a sidebar bookmarks tab with a count badge, persisted in `localStorage`.
+- **Keyboard shortcuts** — `←`/`→` to page between sections, `/` to focus search, `Esc` to clear.
+- **Adjustable text size** — A− / A+ controls in the sidebar; reading font size persists like the theme.
 - **Light / dark theme** — toggle in the sidebar; respects OS preference on first visit, persists choice in `localStorage`, no flash on load.
 - **Print support** — per-section print button with a clean print stylesheet (sidebar/pager hidden, black-on-white) and a footer crediting the source:
   *"Printed from DrFendi's · afandi.amin@customs.gov.my · Digital Customs Act 1967"*.

@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import act, { allSections, findSection, searchSections, bmSection, bmPartTitle } from './data'
 import type { FlatSection } from './data'
 import type { BmSection, Section } from './types'
 import { SectionBody } from './components/SectionBody'
 import { LangProvider, useLang, UI, type Lang } from './i18n'
 import { ThemeProvider, useTheme } from './theme'
+import { useBookmarks, useTextSize } from './hooks'
 
 export default function App() {
   return (
@@ -16,21 +17,79 @@ export default function App() {
   )
 }
 
+type SideMode = 'toc' | 'bookmarks'
+
+function sectionIdFromHash(): string | null {
+  const h = window.location.hash.replace(/^#/, '')
+  return h && findSection(h) ? h : null
+}
+
 function Shell() {
   const { lang, setLang } = useLang()
   const { theme, toggle } = useTheme()
   const t = UI[lang]
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [query, setQuery] = useState('')
-  const results = useMemo(() => searchSections(query), [query])
 
-  const openSection = (id: string) => {
-    setSelectedId(id)
+  const [selectedId, setSelectedId] = useState<string | null>(sectionIdFromHash)
+  const [query, setQuery] = useState('')
+  const [sideMode, setSideMode] = useState<SideMode>('toc')
+  const searchRef = useRef<HTMLInputElement>(null)
+  const results = useMemo(() => searchSections(query), [query])
+  const bookmarks = useBookmarks()
+  const textSize = useTextSize()
+
+  const openSection = useCallback((id: string) => {
+    // Single source of truth: the hash drives selection, so back/forward work.
+    if (window.location.hash.replace(/^#/, '') === id) {
+      setSelectedId(id)
+    } else {
+      window.location.hash = id
+    }
     window.scrollTo({ top: 0 })
-  }
+  }, [])
+
+  // React to hash changes: initial deep link, sidebar clicks, browser nav.
+  useEffect(() => {
+    const onHash = () => {
+      setSelectedId(sectionIdFromHash())
+      window.scrollTo({ top: 0 })
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
 
   const selected = selectedId ? findSection(selectedId) : undefined
   const searching = query.trim().length >= 2
+
+  const idx = selected ? allSections.findIndex((s) => s.id === selected.id) : -1
+  const goPrev = useCallback(() => {
+    if (idx > 0) openSection(allSections[idx - 1].id)
+  }, [idx, openSection])
+  const goNext = useCallback(() => {
+    if (idx >= 0 && idx < allSections.length - 1) openSection(allSections[idx + 1].id)
+  }, [idx, openSection])
+
+  // Keyboard shortcuts: / focuses search, Esc clears, ← → page between sections.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null
+      const typing =
+        target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+
+      if (e.key === '/' && !typing) {
+        e.preventDefault()
+        searchRef.current?.focus()
+        searchRef.current?.select()
+      } else if (e.key === 'Escape') {
+        if (typing) (target as HTMLInputElement).blur()
+        setQuery('')
+      } else if (!typing && selected) {
+        if (e.key === 'ArrowLeft') goPrev()
+        else if (e.key === 'ArrowRight') goNext()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [selected, goPrev, goNext])
 
   return (
     <div className="app">
@@ -39,6 +98,26 @@ function Shell() {
           <div className="brand-row">
             <h1>{t.brandTitle}</h1>
             <div className="brand-actions">
+              <div className="size-controls" role="group" aria-label={t.textSizeLabel}>
+                <button
+                  className="size-btn"
+                  onClick={() => textSize.step(-1)}
+                  disabled={!textSize.canStep(-1)}
+                  title={t.textSizeSmaller}
+                  aria-label={t.textSizeSmaller}
+                >
+                  A−
+                </button>
+                <button
+                  className="size-btn"
+                  onClick={() => textSize.step(1)}
+                  disabled={!textSize.canStep(1)}
+                  title={t.textSizeLarger}
+                  aria-label={t.textSizeLarger}
+                >
+                  A+
+                </button>
+              </div>
               <button
                 className="theme-toggle"
                 onClick={toggle}
@@ -71,6 +150,7 @@ function Shell() {
 
         <div className="search-box">
           <input
+            ref={searchRef}
             type="search"
             placeholder={t.searchPlaceholder}
             value={query}
@@ -78,20 +158,51 @@ function Shell() {
           />
         </div>
 
+        <div className="side-tabs" role="tablist">
+          <button
+            className={`side-tab${sideMode === 'toc' ? ' active' : ''}`}
+            onClick={() => setSideMode('toc')}
+            role="tab"
+            aria-selected={sideMode === 'toc'}
+            title={t.tocTabTitle}
+          >
+            {t.partWord}
+          </button>
+          <button
+            className={`side-tab${sideMode === 'bookmarks' ? ' active' : ''}`}
+            onClick={() => setSideMode('bookmarks')}
+            role="tab"
+            aria-selected={sideMode === 'bookmarks'}
+            title={t.bookmarksTitle}
+          >
+            {t.bookmarksTab}
+            {bookmarks.ids.length > 0 && <span className="badge">{bookmarks.ids.length}</span>}
+          </button>
+        </div>
+
         <nav className="toc">
           {searching ? (
             <SearchResults results={results} query={query} onOpen={openSection} />
+          ) : sideMode === 'bookmarks' ? (
+            <BookmarksList bookmarks={bookmarks} onOpen={openSection} />
           ) : (
             act.parts.map((part) => (
               <PartGroup key={part.id} part={part} selectedId={selectedId} onOpen={openSection} />
             ))
           )}
         </nav>
+
+        <div className="shortcut-hint">{t.shortcutHint}</div>
       </aside>
 
       <main className="content">
         {selected ? (
-          <SectionView section={selected} onOpen={openSection} />
+          <SectionView
+            section={selected}
+            onOpen={openSection}
+            bookmarked={bookmarks.has(selected.id)}
+            onToggleBookmark={() => bookmarks.toggle(selected.id)}
+          />
         ) : (
           <Welcome onOpen={openSection} />
         )}
@@ -166,6 +277,69 @@ function PartGroup({
   )
 }
 
+function BookmarksList({
+  bookmarks,
+  onOpen,
+}: {
+  bookmarks: ReturnType<typeof useBookmarks>
+  onOpen: (id: string) => void
+}) {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const sections = bookmarks.ids
+    .map((id) => allSections.find((s) => s.id === id))
+    .filter((s): s is FlatSection => Boolean(s))
+  if (sections.length === 0) {
+    return <p className="bookmarks-empty">{t.bookmarksEmpty}</p>
+  }
+  return (
+    <>
+      <div className="bookmarks-head">
+        <p className="search-meta">{t.bookmarksTitle}</p>
+        <button className="clear-btn" onClick={bookmarks.clear} title={t.bookmarksClear}>
+          {t.bookmarksClear}
+        </button>
+      </div>
+      <ul className="section-list">
+        {sections.map((s) => {
+          const loc = localized(s, lang)
+          return (
+            <li key={s.id}>
+              <button className="sec-link" onClick={() => onOpen(s.id)}>
+                <span className="sec-num">{s.number}</span>
+                <span className="sec-heading">
+                  {loc.heading}
+                  <em className="sec-part"> — {t.partWord} {s.part.label}</em>
+                </span>
+                <span
+                  className="star remove"
+                  role="button"
+                  tabIndex={0}
+                  title={t.bookmarksRemove}
+                  aria-label={t.bookmarksRemove}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    bookmarks.toggle(s.id)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      bookmarks.toggle(s.id)
+                    }
+                  }}
+                >
+                  ★
+                </span>
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </>
+  )
+}
+
 function SearchResults({
   results,
   query,
@@ -203,9 +377,13 @@ function SearchResults({
 function SectionView({
   section,
   onOpen,
+  bookmarked,
+  onToggleBookmark,
 }: {
   section: FlatSection
   onOpen: (id: string) => void
+  bookmarked: boolean
+  onToggleBookmark: () => void
 }) {
   const { lang } = useLang()
   const t = UI[lang]
@@ -213,6 +391,11 @@ function SectionView({
   const idx = allSections.findIndex((s) => s.id === section.id)
   const prev = idx > 0 ? allSections[idx - 1] : undefined
   const next = allSections[idx + 1]
+
+  const copyLink = useCallback(() => {
+    navigator.clipboard?.writeText(window.location.href).catch(() => {})
+  }, [])
+
   return (
     <article className="section-view">
       <p className="crumb">
@@ -226,14 +409,28 @@ function SectionView({
           </h2>
           <h3 className="sec-title">{loc.heading}</h3>
         </div>
-        <button
-          className="print-btn"
-          onClick={() => window.print()}
-          title={t.printBtnTitle}
-          aria-label={t.printBtnTitle}
-        >
-          🖨 {t.printBtn}
-        </button>
+        <div className="section-tools">
+          <button
+            className={`star-btn${bookmarked ? ' on' : ''}`}
+            onClick={onToggleBookmark}
+            title={bookmarked ? t.starRemove : t.starAdd}
+            aria-label={bookmarked ? t.starRemove : t.starAdd}
+            aria-pressed={bookmarked}
+          >
+            {bookmarked ? '★' : '☆'}
+          </button>
+          <button className="print-btn" onClick={copyLink} title={t.copyLinkTitle} aria-label={t.copyLinkTitle}>
+            🔗
+          </button>
+          <button
+            className="print-btn"
+            onClick={() => window.print()}
+            title={t.printBtnTitle}
+            aria-label={t.printBtnTitle}
+          >
+            🖨 {t.printBtn}
+          </button>
+        </div>
       </div>
       <SectionBody section={loc} lang={lang} />
       <div className="pager">

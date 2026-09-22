@@ -25,7 +25,7 @@ By **Dr.Fendi Ameen** · [afandi.amin@customs.gov.my](mailto:afandi.amin@customs
 - **Schedule & savings note** — the Act's Schedule (section 169) is browsable and shareable at `#schedule`, with print support.
 - **Context-aware TOC** — the sidebar auto-expands the PART containing the current section and scrolls it into view.
 - **Back to top** — a floating button appears after scrolling a full section.
-- **Cross-reference links** — citations like "section 65A" or "sections 12, 13 and 14" in section text are clickable and jump within the app; hovering shows a preview of the target section's PART, heading, and an opening-line snippet (localized in BM). Citations to other laws are left as plain text.
+- **Cross-reference links** — citations like "section 65A" or "sections 12, 13 and 14" in section text are clickable and jump within the app; hovering shows a preview of the target section's PART, heading, and an opening-line snippet (localized in BM), and clicking the preview opens the full section in an overlay — no page navigation required. Citations to other laws are left as plain text.
 - **Light / dark theme** — toggle in the sidebar; respects OS preference on first visit, persists choice in `localStorage`, no flash on load.
 - **Print support** — per-section print button with a clean print stylesheet (sidebar/pager hidden, black-on-white) and a footer crediting the source:
   *"Printed from DrFendi's · afandi.amin@customs.gov.my · Digital Customs Act 1967"*.

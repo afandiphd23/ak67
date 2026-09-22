@@ -767,6 +767,104 @@ body {
   color: var(--muted);
 }
 
+.xref-pop-hint {
+  font-size: 10.5px;
+  color: var(--muted);
+  font-style: italic;
+  border-top: 1px dashed var(--line);
+  padding-top: 4px;
+  margin-top: 2px;
+}
+
+/* ---------------------------------------------------------- xref modal */
+
+.xref-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 15, 20, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.xref-modal {
+  background: var(--panel);
+  color: var(--ink);
+  width: min(680px, 100%);
+  max-height: min(82vh, 900px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.xref-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.xref-modal-title {
+  margin: 2px 0 0;
+  font-size: 19px;
+  color: var(--accent);
+}
+
+.xref-modal-head .crumb {
+  margin: 0;
+}
+
+.xref-modal-close {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.xref-modal-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.xref-modal-body {
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+
+.xref-modal-body .section-body {
+  font-size: calc(15px + var(--text-scale) * 1.5px);
+}
+
+.xref-modal-actions {
+  padding: 12px 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .xref-modal-overlay {
+    padding: 10px;
+  }
+
+  .xref-modal-body {
+    padding: 12px 14px;
+  }
+}
+
 .deleted-note {
   color: var(--muted);
   font-style: italic;
@@ -928,6 +1026,10 @@ body {
   }
 
   .xref-pop {
+    display: none !important;
+  }
+
+  .xref-modal-overlay {
     display: none !important;
   }
 }

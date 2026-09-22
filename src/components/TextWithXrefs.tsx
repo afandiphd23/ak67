@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { findSection, sectionByNumber } from '../data'
+import { bmSection, findSection, sectionByNumber } from '../data'
 import type { FlatSection } from '../data'
-import { bmSection } from '../data'
 import { UI, useLang } from '../i18n'
+import { SectionBody } from './SectionBody'
 
 /** A run of plain text, or a link to another section of the Act. */
 export type Token = string | { kind: 'xref'; id: string; label: string }
@@ -66,6 +66,7 @@ export function TextWithXrefs({ text }: { text: string }) {
     y: number
     above: boolean
   } | null>(null)
+  const [modalId, setModalId] = useState<string | null>(null)
   const timer = useRef<number | undefined>(undefined)
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
@@ -87,10 +88,13 @@ export function TextWithXrefs({ text }: { text: string }) {
     }, 150)
   }
 
-  const hide = () => {
+  // Delayed hide keeps the popover alive long enough to click it; moving the
+  // cursor onto the popover cancels the hide.
+  const hideSoon = () => {
     window.clearTimeout(timer.current)
-    setPreview(null)
+    timer.current = window.setTimeout(() => setPreview(null), 200)
   }
+  const cancelHide = () => window.clearTimeout(timer.current)
 
   return (
     <>
@@ -103,9 +107,9 @@ export function TextWithXrefs({ text }: { text: string }) {
             className="xref"
             href={`#${tok.id}`}
             onMouseEnter={(e) => show(e.currentTarget, tok.id)}
-            onMouseLeave={hide}
+            onMouseLeave={hideSoon}
             onFocus={(e) => show(e.currentTarget, tok.id)}
-            onBlur={hide}
+            onBlur={hideSoon}
             onClick={(e) => {
               // Self-references don't change the hash; re-fire to scroll to top.
               if (window.location.hash === `#${tok.id}`) {
@@ -124,8 +128,15 @@ export function TextWithXrefs({ text }: { text: string }) {
           x={preview.x}
           y={preview.y}
           above={preview.above}
+          onEnter={cancelHide}
+          onLeave={hideSoon}
+          onOpen={() => {
+            setPreview(null)
+            setModalId(preview.section.id)
+          }}
         />
       )}
+      {modalId && <XrefModal id={modalId} onClose={() => setModalId(null)} />}
     </>
   )
 }
@@ -135,11 +146,17 @@ function XrefPreview({
   x,
   y,
   above,
+  onEnter,
+  onLeave,
+  onOpen,
 }: {
   section: FlatSection
   x: number
   y: number
   above: boolean
+  onEnter: () => void
+  onLeave: () => void
+  onOpen: () => void
 }) {
   const { lang } = useLang()
   const t = UI[lang]
@@ -150,7 +167,11 @@ function XrefPreview({
     <div
       className={`xref-pop${above ? ' above' : ''}`}
       style={{ left: x, top: y }}
-      role="tooltip"
+      role="button"
+      title={t.previewOpenTitle}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onClick={onOpen}
     >
       <span className="xref-pop-crumb">
         {t.partWord} {section.part.label}
@@ -159,6 +180,89 @@ function XrefPreview({
         {t.secWord} {section.number} — {heading}
       </span>
       {snippet && <span className="xref-pop-snippet">{snippet.slice(0, 160)}…</span>}
+      <span className="xref-pop-hint">{t.previewOpenTitle}</span>
+    </div>
+  )
+}
+
+/** Compact full-text preview of a section, shown over the page. */
+function XrefModal({ id, onClose }: { id: string; onClose: () => void }) {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const section = findSection(id)
+  const closeRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    // Navigating (link, back/forward, "open full") always closes the preview.
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('hashchange', onClose)
+    closeRef.current?.focus()
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('hashchange', onClose)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [onClose])
+
+  if (!section) return null
+  const bm = lang === 'bm' ? bmSection(section.id) : undefined
+  const loc: FlatSection = bm ? { ...section, heading: bm.heading, content: bm.content } : section
+
+  const openFull = () => {
+    if (window.location.hash === `#${section.id}`) {
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+    } else {
+      window.location.hash = section.id
+    }
+    window.scrollTo({ top: 0 })
+  }
+
+  return (
+    <div
+      className="xref-modal-overlay"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div
+        className="xref-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${t.secWord} ${section.number}`}
+      >
+        <div className="xref-modal-head">
+          <div>
+            <p className="crumb">
+              {t.partWord} {section.part.label}
+            </p>
+            <h2 className="xref-modal-title">
+              {t.secWord} {section.number} — {loc.heading}
+            </h2>
+          </div>
+          <button
+            ref={closeRef}
+            className="xref-modal-close"
+            onClick={onClose}
+            title={t.previewClose}
+            aria-label={t.previewClose}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="xref-modal-body">
+          <SectionBody section={loc} lang={lang} />
+        </div>
+        <div className="xref-modal-actions">
+          <button className="btn" onClick={openFull}>
+            {t.previewOpenFull}
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

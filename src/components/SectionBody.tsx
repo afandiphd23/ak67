@@ -1,6 +1,7 @@
 import type { FlatSection } from '../data'
 import type { QuoteBlock } from '../types'
 import Annotation from './Annotation'
+import { TextWithXrefs } from './TextWithXrefs'
 import { UI, type Lang } from '../i18n'
 
 export function SectionBody({ section, lang }: { section: FlatSection; lang: Lang }) {
@@ -26,7 +27,7 @@ export function SectionBody({ section, lang }: { section: FlatSection; lang: Lan
         }
         return (
           <p key={i} className={block.kind === 'item' ? 'item' : 'para'}>
-            {block.text}
+            <TextWithXrefs text={block.text} />
             {block.annotation && <Annotation text={block.annotation} />}
           </p>
         )
@@ -43,14 +44,14 @@ function QuoteEntry({ block }: { block: QuoteBlock }) {
   return (
     <div className="quote-entry">
       <p className="quote-term">
-        &ldquo;{block.term}&rdquo; {block.text}
+        &ldquo;<TextWithXrefs text={block.term} /> {block.text}
         {block.annotation && <Annotation text={block.annotation} />}
       </p>
       {block.items.length > 0 && (
         <div className="quote-items">
           {block.items.map((it, i) => (
             <p key={i} className="item">
-              {it}
+              <TextWithXrefs text={it} />
             </p>
           ))}
         </div>

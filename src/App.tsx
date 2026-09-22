@@ -3,6 +3,7 @@ import act, { allSections, findSection, searchSections, bmSection, bmPartTitle }
 import type { FlatSection } from './data'
 import type { BmSection, Section } from './types'
 import { SectionBody } from './components/SectionBody'
+import { TextWithXrefs } from './components/TextWithXrefs'
 import { LangProvider, useLang, UI, type Lang } from './i18n'
 import { ThemeProvider, useTheme } from './theme'
 import { useBookmarks, useTextSize, useTrackSection } from './hooks'
@@ -535,7 +536,7 @@ function ScheduleView() {
       <div className="section-body">
         {act.schedule.paragraphs.map((p, i) => (
           <p key={i} className="para">
-            {p}
+            <TextWithXrefs text={p} />
           </p>
         ))}
         {act.note && (
@@ -545,7 +546,7 @@ function ScheduleView() {
               const cls = p.trim().startsWith('(') ? 'item' : 'para'
               return (
                 <p key={i} className={cls}>
-                  {p}
+                  <TextWithXrefs text={p} />
                 </p>
               )
             })}

@@ -21,6 +21,14 @@ export function findSection(id: string): FlatSection | undefined {
   return allSections.find((s) => s.id === id)
 }
 
+/** Index of sections by citation number (e.g. "65A"), for cross-reference links. */
+const sectionByNumberMap = new Map(allSections.map((s) => [s.number.toUpperCase(), s]))
+
+/** Look up a section by its citation number, e.g. sectionByNumber('65A'). */
+export function sectionByNumber(number: string): FlatSection | undefined {
+  return sectionByNumberMap.get(number.toUpperCase())
+}
+
 /** Bahasa Melayu heading/content for a section, or undefined if not translated. */
 export function bmSection(id: string): BmSection | undefined {
   return bm[id]

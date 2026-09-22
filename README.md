@@ -4,6 +4,12 @@ A bilingual (English / Bahasa Melayu) reader for Malaysia's **Customs Act 1967 (
 
 By **Dr.Fendi Ameen** · [afandi.amin@customs.gov.my](mailto:afandi.amin@customs.gov.my)
 
+## Screenshots
+
+| Light | Dark |
+|---|---|
+| ![Light theme](docs/screenshot-main.png) | ![Dark theme](docs/screenshot-dark.png) |
+
 ---
 
 ## Features

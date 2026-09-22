@@ -47,7 +47,7 @@ export const UI = {
   en: {
     brandTitle: 'Customs Act 1967',
     brandSub: 'Laws of Malaysia · Act 235',
-    creatorLabel: 'by Afandi Amin',
+    creatorLabel: 'by Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'Email the creator: afandi.amin@customs.gov.my',
     searchPlaceholder: 'Search sections & text…',
@@ -79,7 +79,7 @@ export const UI = {
   bm: {
     brandTitle: 'Akta Kastam 1967',
     brandSub: 'Undang-Undang Malaysia · Akta 235',
-    creatorLabel: 'oleh Afandi Amin',
+    creatorLabel: 'oleh Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'E-mel pencipta: afandi.amin@customs.gov.my',
     searchPlaceholder: 'Cari seksyen & teks…',

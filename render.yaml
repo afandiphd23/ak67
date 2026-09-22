@@ -1,0 +1,24 @@
+# Render Blueprint — deploy the Customs Act 1967 app as a static site.
+# The app lives in the customs-act-app/ subfolder of this repo, hence rootDir.
+services:
+  - type: web
+    name: ak67
+    runtime: static
+    rootDir: customs-act-app
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    # Relative base ('./') in vite.config.ts makes the build work from any path.
+    headers:
+      # Always revalidate the HTML shell so deploys are picked up instantly.
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+      # Hashed assets are immutable — cache for a year.
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    # SPA fallback: serve index.html for unknown paths.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

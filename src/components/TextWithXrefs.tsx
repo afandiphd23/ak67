@@ -1,5 +1,8 @@
-import { Fragment, useMemo } from 'react'
-import { sectionByNumber } from '../data'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
+import { findSection, sectionByNumber } from '../data'
+import type { FlatSection } from '../data'
+import { bmSection } from '../data'
+import { UI, useLang } from '../i18n'
 
 /** A run of plain text, or a link to another section of the Act. */
 export type Token = string | { kind: 'xref'; id: string; label: string }
@@ -50,9 +53,45 @@ export function tokenize(text: string): Token[] {
   return tokens
 }
 
+function clamp(v: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, v))
+}
+
 /** Renders text with "section 65A"-style citations linked to their sections. */
 export function TextWithXrefs({ text }: { text: string }) {
   const tokens = useMemo(() => tokenize(text), [text])
+  const [preview, setPreview] = useState<{
+    section: FlatSection
+    x: number
+    y: number
+    above: boolean
+  } | null>(null)
+  const timer = useRef<number | undefined>(undefined)
+
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  const show = (el: HTMLElement, id: string) => {
+    const section = findSection(id)
+    if (!section) return
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => {
+      const r = el.getBoundingClientRect()
+      // Prefer below the link; flip above when the viewport bottom is near.
+      const above = window.innerHeight - r.bottom < 180
+      setPreview({
+        section,
+        x: clamp(r.left + r.width / 2, 175, window.innerWidth - 175),
+        y: above ? r.top - 8 : r.bottom + 8,
+        above,
+      })
+    }, 150)
+  }
+
+  const hide = () => {
+    window.clearTimeout(timer.current)
+    setPreview(null)
+  }
+
   return (
     <>
       {tokens.map((tok, i) =>
@@ -63,6 +102,10 @@ export function TextWithXrefs({ text }: { text: string }) {
             key={i}
             className="xref"
             href={`#${tok.id}`}
+            onMouseEnter={(e) => show(e.currentTarget, tok.id)}
+            onMouseLeave={hide}
+            onFocus={(e) => show(e.currentTarget, tok.id)}
+            onBlur={hide}
             onClick={(e) => {
               // Self-references don't change the hash; re-fire to scroll to top.
               if (window.location.hash === `#${tok.id}`) {
@@ -75,6 +118,47 @@ export function TextWithXrefs({ text }: { text: string }) {
           </a>
         ),
       )}
+      {preview && (
+        <XrefPreview
+          section={preview.section}
+          x={preview.x}
+          y={preview.y}
+          above={preview.above}
+        />
+      )}
     </>
+  )
+}
+
+function XrefPreview({
+  section,
+  x,
+  y,
+  above,
+}: {
+  section: FlatSection
+  x: number
+  y: number
+  above: boolean
+}) {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const bm = lang === 'bm' ? bmSection(section.id) : undefined
+  const heading = bm?.heading ?? section.heading
+  const snippet = (bm?.content[0]?.text ?? section.content[0]?.text ?? '').trim()
+  return (
+    <div
+      className={`xref-pop${above ? ' above' : ''}`}
+      style={{ left: x, top: y }}
+      role="tooltip"
+    >
+      <span className="xref-pop-crumb">
+        {t.partWord} {section.part.label}
+      </span>
+      <span className="xref-pop-title">
+        {t.secWord} {section.number} — {heading}
+      </span>
+      {snippet && <span className="xref-pop-snippet">{snippet.slice(0, 160)}…</span>}
+    </div>
   )
 }

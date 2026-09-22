@@ -724,6 +724,49 @@ body {
   border-bottom-style: solid;
 }
 
+.xref-pop {
+  position: fixed;
+  transform: translateX(-50%);
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  padding: 10px 13px;
+  pointer-events: none;
+  z-index: 90;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.xref-pop.above {
+  transform: translate(-50%, -100%);
+}
+
+.xref-pop-crumb {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.xref-pop-title {
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.xref-pop-snippet {
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .deleted-note {
   color: var(--muted);
   font-style: italic;
@@ -882,6 +925,10 @@ body {
   .xref {
     color: #000;
     border-bottom-color: #999;
+  }
+
+  .xref-pop {
+    display: none !important;
   }
 }
 

@@ -12,6 +12,13 @@ const Ctx = createContext<LangCtx>({ lang: 'en', setLang: () => {} })
 const STORAGE_KEY = 'customs-act-lang'
 
 function initialLang(): Lang {
+  // URL param wins (?lang=bm|en) — handy for sharing language-specific links.
+  try {
+    const q = new URLSearchParams(window.location.search).get('lang')
+    if (q === 'bm' || q === 'en') return q
+  } catch {
+    /* ignore */
+  }
   try {
     return localStorage.getItem(STORAGE_KEY) === 'bm' ? 'bm' : 'en'
   } catch {

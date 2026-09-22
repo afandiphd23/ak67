@@ -13,6 +13,13 @@ const Ctx = createContext<ThemeCtx>({ theme: 'light', setTheme: () => {}, toggle
 const STORAGE_KEY = 'customs-act-theme'
 
 function initialTheme(): Theme {
+  // URL param wins (?theme=dark|light) — handy for sharing themed links.
+  try {
+    const q = new URLSearchParams(window.location.search).get('theme')
+    if (q === 'dark' || q === 'light') return q
+  } catch {
+    /* ignore */
+  }
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved === 'dark' || saved === 'light') return saved

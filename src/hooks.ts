@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 function read(key: string, fallback: string): string {
   try {
@@ -49,6 +49,37 @@ export function useBookmarks() {
   const clear = useCallback(() => persist([]), [])
 
   return { ids, has, toggle, clear }
+}
+
+/* ------------------------------------------------------------ recent */
+
+const RECENT_KEY = 'customs-act-recent'
+const RECENT_MAX = 8
+
+function initialRecent(): string[] {
+  try {
+    const parsed: unknown = JSON.parse(read(RECENT_KEY, '[]'))
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+/** Tracks the current section id into recent list; calls onChange with the fresh list. */
+export function useTrackSection(id: string | null, onChange: (ids: string[]) => void) {
+  const last = useRef<string | null>(null)
+  useEffect(() => {
+    if (!id || last.current === id) return
+    last.current = id
+    setIdsInStorage(id, onChange)
+  }, [id, onChange])
+}
+
+function setIdsInStorage(id: string, onChange: (ids: string[]) => void) {
+  const prev = initialRecent()
+  const next = [id, ...prev.filter((x) => x !== id)].slice(0, RECENT_MAX)
+  write(RECENT_KEY, JSON.stringify(next))
+  onChange(next)
 }
 
 /* ------------------------------------------------------------ text size */

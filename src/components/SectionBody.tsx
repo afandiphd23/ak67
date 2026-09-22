@@ -14,6 +14,7 @@ export function SectionBody({ section, lang }: { section: FlatSection; lang: Lan
         </p>
         {lang === 'bm' && <p className="translation-note">{t.translatedNote}</p>}
         <p className="print-footer">{t.printFooter}</p>
+        <p className="print-footer">{t.printDisclaimer}</p>
       </>
     )
   }
@@ -33,6 +34,7 @@ export function SectionBody({ section, lang }: { section: FlatSection; lang: Lan
       {section.annotation && <Annotation text={section.annotation} />}
       {lang === 'bm' && <p className="translation-note">{t.translatedNote}</p>}
       <p className="print-footer">{t.printFooter}</p>
+      <p className="print-footer">{t.printDisclaimer}</p>
     </div>
   )
 }

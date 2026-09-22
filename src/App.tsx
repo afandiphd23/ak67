@@ -5,7 +5,7 @@ import type { BmSection, Section } from './types'
 import { SectionBody } from './components/SectionBody'
 import { LangProvider, useLang, UI, type Lang } from './i18n'
 import { ThemeProvider, useTheme } from './theme'
-import { useBookmarks, useTextSize } from './hooks'
+import { useBookmarks, useTextSize, useTrackSection } from './hooks'
 
 export default function App() {
   return (
@@ -19,9 +19,16 @@ export default function App() {
 
 type SideMode = 'toc' | 'bookmarks'
 
-function sectionIdFromHash(): string | null {
+/** The two kinds of view the reader can be on, each with a shareable URL. */
+type View = { kind: 'section'; id: string } | { kind: 'schedule' }
+
+const SCHEDULE_HASH = 'schedule'
+
+function parseHash(): View | null {
   const h = window.location.hash.replace(/^#/, '')
-  return h && findSection(h) ? h : null
+  if (h === SCHEDULE_HASH) return { kind: 'schedule' }
+  if (h && findSection(h)) return { kind: 'section', id: h }
+  return null
 }
 
 function Shell() {
@@ -29,7 +36,7 @@ function Shell() {
   const { theme, toggle } = useTheme()
   const t = UI[lang]
 
-  const [selectedId, setSelectedId] = useState<string | null>(sectionIdFromHash)
+  const [view, setView] = useState<View | null>(parseHash)
   const [query, setQuery] = useState('')
   const [sideMode, setSideMode] = useState<SideMode>('toc')
   const searchRef = useRef<HTMLInputElement>(null)
@@ -37,12 +44,31 @@ function Shell() {
   const bookmarks = useBookmarks()
   const textSize = useTextSize()
 
+  const selectedId = view?.kind === 'section' ? view.id : null
+  const selected = selectedId ? findSection(selectedId) : undefined
+  const searching = query.trim().length >= 2
+
+  // Recently-read list, most recent first.
+  const [recentIds, setRecentIds] = useState<string[]>(() =>
+    JSON.parse(localStorage.getItem('customs-act-recent') ?? '[]'),
+  )
+  useTrackSection(selectedId, setRecentIds)
+
   const openSection = useCallback((id: string) => {
-    // Single source of truth: the hash drives selection, so back/forward work.
+    // Hash drives selection, so back/forward and shared links work.
     if (window.location.hash.replace(/^#/, '') === id) {
-      setSelectedId(id)
+      setView({ kind: 'section', id })
     } else {
       window.location.hash = id
+    }
+    window.scrollTo({ top: 0 })
+  }, [])
+
+  const openSchedule = useCallback(() => {
+    if (window.location.hash.replace(/^#/, '') === SCHEDULE_HASH) {
+      setView({ kind: 'schedule' })
+    } else {
+      window.location.hash = SCHEDULE_HASH
     }
     window.scrollTo({ top: 0 })
   }, [])
@@ -50,15 +76,12 @@ function Shell() {
   // React to hash changes: initial deep link, sidebar clicks, browser nav.
   useEffect(() => {
     const onHash = () => {
-      setSelectedId(sectionIdFromHash())
+      setView(parseHash())
       window.scrollTo({ top: 0 })
     }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
-
-  const selected = selectedId ? findSection(selectedId) : undefined
-  const searching = query.trim().length >= 2
 
   const idx = selected ? allSections.findIndex((s) => s.id === selected.id) : -1
   const goPrev = useCallback(() => {
@@ -186,9 +209,22 @@ function Shell() {
           ) : sideMode === 'bookmarks' ? (
             <BookmarksList bookmarks={bookmarks} onOpen={openSection} />
           ) : (
-            act.parts.map((part) => (
-              <PartGroup key={part.id} part={part} selectedId={selectedId} onOpen={openSection} />
-            ))
+            <>
+              {act.parts.map((part) => (
+                <PartGroup
+                  key={part.id}
+                  part={part}
+                  selectedId={selectedId}
+                  onOpen={openSection}
+                />
+              ))}
+              <div className="toc-extra">
+                <button className="schedule-link" onClick={openSchedule}>
+                  <span className="sec-num">§</span>
+                  <span>{t.scheduleTitle}</span>
+                </button>
+              </div>
+            </>
           )}
         </nav>
 
@@ -203,10 +239,13 @@ function Shell() {
             bookmarked={bookmarks.has(selected.id)}
             onToggleBookmark={() => bookmarks.toggle(selected.id)}
           />
+        ) : view?.kind === 'schedule' ? (
+          <ScheduleView />
         ) : (
-          <Welcome onOpen={openSection} />
+          <Welcome onOpen={openSection} onOpenSchedule={openSchedule} recentIds={recentIds} />
         )}
       </main>
+      <BackToTop />
     </div>
   )
 }
@@ -239,7 +278,24 @@ function PartGroup({
 }) {
   const { lang } = useLang()
   const t = UI[lang]
-  const [open, setOpen] = useState(false)
+  const containsSelected = selectedId != null && part.sections.some((s) => s.id === selectedId)
+  // Auto-expand the PART holding the current section; still manually collapsible.
+  const [openState, setOpen] = useState(false)
+  const open = openState || containsSelected
+  const listRef = useRef<HTMLUListElement>(null)
+
+  // Scroll the auto-expanded group into view (not on first paint).
+  const firstScroll = useRef(true)
+  useEffect(() => {
+    if (firstScroll.current) {
+      firstScroll.current = false
+      return
+    }
+    if (open && containsSelected && listRef.current) {
+      listRef.current.scrollIntoView({ block: 'nearest' })
+    }
+  }, [open, containsSelected])
+
   const hasSections = part.sections.length > 0
   return (
     <div className="part-group">
@@ -256,7 +312,7 @@ function PartGroup({
         {!hasSections && <span className="count">{t.noSections}</span>}
       </button>
       {open && hasSections && (
-        <ul className="section-list">
+        <ul className="section-list" ref={listRef}>
           {part.sections.map((s) => {
             const loc = localized(s, lang)
             return (
@@ -453,23 +509,121 @@ function SectionView({
   )
 }
 
-function Welcome({ onOpen }: { onOpen: (id: string) => void }) {
+function ScheduleView() {
+  const { lang } = useLang()
+  const t = UI[lang]
+  if (!act.schedule) return null
+  return (
+    <article className="section-view">
+      <p className="crumb">{t.scheduleCrumb}</p>
+      <div className="section-head">
+        <div>
+          <h2>{t.scheduleTitle}</h2>
+          <h3 className="sec-title">{act.schedule.title}</h3>
+        </div>
+        <div className="section-tools">
+          <button
+            className="print-btn"
+            onClick={() => window.print()}
+            title={t.printBtnTitle}
+            aria-label={t.printBtnTitle}
+          >
+            🖨 {t.printBtn}
+          </button>
+        </div>
+      </div>
+      <div className="section-body">
+        {act.schedule.paragraphs.map((p, i) => (
+          <p key={i} className="para">
+            {p}
+          </p>
+        ))}
+        {act.note && (
+          <div className="schedule-note">
+            <h4>{act.note.title}</h4>
+            {act.note.paragraphs.map((p, i) => {
+              const cls = p.trim().startsWith('(') ? 'item' : 'para'
+              return (
+                <p key={i} className={cls}>
+                  {p}
+                </p>
+              )
+            })}
+          </div>
+        )}
+        <p className="print-footer">{t.printFooter}</p>
+        <p className="print-footer">{t.printDisclaimer}</p>
+      </div>
+    </article>
+  )
+}
+
+function Welcome({
+  onOpen,
+  onOpenSchedule,
+  recentIds,
+}: {
+  onOpen: (id: string) => void
+  onOpenSchedule: () => void
+  recentIds: string[]
+}) {
   const { lang } = useLang()
   const t = UI[lang]
   const first = allSections[0]
   const last = allSections[allSections.length - 1]
+  const recent = recentIds
+    .map((id) => allSections.find((s) => s.id === id))
+    .filter((s): s is FlatSection => Boolean(s))
+    .slice(0, 5)
+  const lastRead = recent[0]
   return (
     <div className="welcome">
       <h2>{t.welcomeTitle}</h2>
       <p className="lead">{t.welcomeLead(allSections.length)}</p>
+      {lastRead && (
+        <div className="resume-card">
+          <span className="resume-label">{t.continueReading}</span>
+          <button className="resume-btn" onClick={() => onOpen(lastRead.id)}>
+            <span className="sec-num">{lastRead.number}</span>
+            <span>{localized(lastRead, lang).heading}</span>
+          </button>
+        </div>
+      )}
       <div className="welcome-actions">
-        <button className="btn" onClick={() => onOpen(first.id)}>
-          {t.startBtn}
-        </button>
+        {lastRead ? (
+          <button className="btn" onClick={() => onOpen(lastRead.id)}>
+            {t.continueReading} →
+          </button>
+        ) : (
+          <button className="btn" onClick={() => onOpen(first.id)}>
+            {t.startBtn}
+          </button>
+        )}
         <button className="btn secondary" onClick={() => onOpen(last.id)}>
           {t.jumpBtn}
         </button>
+        <button className="btn secondary" onClick={onOpenSchedule}>
+          {t.scheduleBtn}
+        </button>
       </div>
+      {recent.length > 1 && (
+        <div className="recent-list">
+          <p className="crumb">{t.recentStat}</p>
+          <ul className="section-list">
+            {recent.slice(1).map((s) => (
+              <li key={s.id}>
+                <button className="sec-link" onClick={() => onOpen(s.id)}>
+                  <span className="sec-num">{s.number}</span>
+                  <span className="sec-heading">
+                    {localized(s, lang).heading}
+                    <em className="sec-part"> — {t.partWord} {s.part.label}</em>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <div className="stats">
         <div>
           <strong>{act.parts.length}</strong> {t.partsStat}
@@ -481,8 +635,51 @@ function Welcome({ onOpen }: { onOpen: (id: string) => void }) {
           <strong>1</strong> {t.scheduleStat}
         </div>
       </div>
+      <Disclaimer />
       <p className="translation-note">{t.translatedNote}</p>
     </div>
+  )
+}
+
+function Disclaimer() {
+  const { lang } = useLang()
+  const t = UI[lang]
+  return (
+    <aside className="disclaimer">
+      <h3>{t.disclaimerTitle}</h3>
+      <p>{t.disclaimerP1}</p>
+      <p>{t.disclaimerP2}</p>
+      <p>
+        {t.disclaimerP3}{' '}
+        <a href={`https://${t.disclaimerPortal}`} target="_blank" rel="noopener noreferrer">
+          🔗 {t.disclaimerPortal}
+        </a>
+      </p>
+      <p className="disclaimer-updated">{t.disclaimerUpdated}</p>
+    </aside>
+  )
+}
+
+function BackToTop() {
+  const { lang } = useLang()
+  const t = UI[lang]
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  if (!visible) return null
+  return (
+    <button
+      className="back-to-top"
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      title={t.backToTop}
+      aria-label={t.backToTop}
+    >
+      ↑
+    </button>
   )
 }
 

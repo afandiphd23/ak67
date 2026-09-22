@@ -21,11 +21,16 @@ By **Dr.Fendi Ameen** · [afandi.amin@customs.gov.my](mailto:afandi.amin@customs
 - **Bookmarks** — star any section (☆ → ★) and it appears in a sidebar bookmarks tab with a count badge, persisted in `localStorage`.
 - **Keyboard shortcuts** — `←`/`→` to page between sections, `/` to focus search, `Esc` to clear.
 - **Adjustable text size** — A− / A+ controls in the sidebar; reading font size persists like the theme.
+- **Recently viewed / resume reading** — the welcome screen shows a *Continue reading* card for your last-read section plus the 5 most recent ones, persisted in `localStorage`.
+- **Schedule & savings note** — the Act's Schedule (section 169) is browsable and shareable at `#schedule`, with print support.
+- **Context-aware TOC** — the sidebar auto-expands the PART containing the current section and scrolls it into view.
+- **Back to top** — a floating button appears after scrolling a full section.
 - **Light / dark theme** — toggle in the sidebar; respects OS preference on first visit, persists choice in `localStorage`, no flash on load.
 - **Print support** — per-section print button with a clean print stylesheet (sidebar/pager hidden, black-on-white) and a footer crediting the source:
   *"Printed from DrFendi's · afandi.amin@customs.gov.my · Digital Customs Act 1967"*.
 - **Amendment annotations** — inline statutory citations (e.g. `[Amd. S6 Act A1593 w.e.f. 1/1/2020]`) preserved and rendered as chips.
 - **Deleted sections** — repealed/omitted sections and ranges shown with strikethrough and an explanatory note.
+- **Disclaimer** — a prominent notice on the home page (and in every printout) clarifying this is an unofficial convenience reference and pointing to the authoritative text at [lom.agc.gov.my](https://lom.agc.gov.my).
 - **Zero backend** — static SPA; all data is embedded JSON.
 
 ## Tech stack

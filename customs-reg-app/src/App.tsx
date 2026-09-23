@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import reg, { allRegulations, findRegulation, searchRegulations, partTitle } from './data'
-import type { FlatRegulation, Regulation, Schedule } from './types'
+import type { Block, FlatRegulation, Regulation, Schedule } from './types'
 import { SectionBody } from './components/SectionBody'
 import { TextWithXrefs } from './components/TextWithXrefs'
 import { LangProvider, useLang, UI, type Lang } from './i18n'
@@ -8,6 +8,9 @@ import { ThemeProvider, useTheme } from './theme'
 import { useBookmarks, useTextSize, useTrackSection } from './hooks'
 
 import { AuthProvider, AuthGate, useAuth } from './auth'
+import { AudioPlayer } from './components/AudioPlayer'
+import { SpotlightSearch } from './components/SpotlightSearch'
+import { OfficerNotes } from './components/OfficerNotes'
 
 export default function App() {
   return (
@@ -49,6 +52,49 @@ function getLandingUrl(): string {
   return '../'
 }
 
+function getActUrl(): string {
+  if (typeof window === 'undefined') return '../customs-act-app/'
+  const isDev =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '[::1]'
+  if (isDev && window.location.port === '5175') {
+    return 'http://localhost:5174/'
+  }
+  return '../customs-act-app/'
+}
+
+function extractSectionPlainText(sec: { content: Block[] }): string {
+  const parts: string[] = []
+  for (const b of sec.content) {
+    if (b.kind === 'quote') {
+      parts.push(`${b.term}: ${b.text}`)
+      if (b.items) parts.push(...b.items)
+    } else if (b.text) {
+      parts.push(b.text)
+    }
+  }
+  return parts.join('\n\n')
+}
+
+function ReadingProgressBar() {
+  const [progress, setProgress] = useState(0)
+  useEffect(() => {
+    const handleScroll = () => {
+      const total = document.documentElement.scrollHeight - window.innerHeight
+      if (total <= 0) {
+        setProgress(0)
+        return
+      }
+      setProgress(Math.min(100, Math.max(0, (window.scrollY / total) * 100)))
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return <div className="reading-progress-bar" style={{ width: `${progress}%` }} />
+}
+
 function Shell() {
   const { user, logout } = useAuth()
   const { lang, setLang } = useLang()
@@ -58,6 +104,8 @@ function Shell() {
   const [view, setView] = useState<View | null>(parseHash)
   const [query, setQuery] = useState('')
   const [sideMode, setSideMode] = useState<SideMode>('toc')
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
   const results = useMemo(() => searchRegulations(query), [query])
   const bookmarks = useBookmarks()
@@ -66,6 +114,11 @@ function Shell() {
   const selectedId = view?.kind === 'section' ? view.id : null
   const selected = selectedId ? findRegulation(selectedId) : undefined
   const searching = query.trim().length >= 2
+
+  const showToast = useCallback((msg: string) => {
+    setToastMessage(msg)
+    setTimeout(() => setToastMessage(null), 2500)
+  }, [])
 
   // Recently-read list, most recent first.
   const [recentIds, setRecentIds] = useState<string[]>(() =>
@@ -110,7 +163,7 @@ function Shell() {
     if (idx >= 0 && idx < allRegulations.length - 1) openSection(allRegulations[idx + 1].id)
   }, [idx, openSection])
 
-  // Keyboard shortcuts: / focuses search, Esc clears, ← → page between regulations.
+  // Keyboard shortcuts: Ctrl+K spotlight, / focuses search, Esc clears, ← → page between regulations.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null
@@ -119,7 +172,10 @@ function Shell() {
       // The cross-reference preview modal handles ← → itself while open.
       const modalOpen = document.body.dataset.xrefModal === '1'
 
-      if (e.key === '/' && !typing) {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setIsSpotlightOpen((prev) => !prev)
+      } else if (e.key === '/' && !typing) {
         e.preventDefault()
         searchRef.current?.focus()
         searchRef.current?.select()
@@ -137,12 +193,20 @@ function Shell() {
 
   return (
     <div className="app">
+      <ReadingProgressBar />
       <aside className="sidebar">
         <div className="brand">
           <div className="brand-portal">
             <a href={getLandingUrl()} className="portal-link" title={t.portalBtnTitle}>
               <span className="portal-arrow" aria-hidden="true">←</span>
               <span>{t.portalBtn}</span>
+            </a>
+            <a
+              href={getActUrl()}
+              className="companion-link"
+              title={lang === 'bm' ? 'Akta Kastam 1967 (Akta 235)' : 'Customs Act 1967 (Act 235)'}
+            >
+              <span>🏛️ {lang === 'bm' ? 'Akta 1967' : 'Act 1967'} →</span>
             </a>
             {user && (
               <div className="officer-portal-badge">
@@ -221,6 +285,14 @@ function Shell() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
+          <button
+            type="button"
+            className="spotlight-quick-btn"
+            onClick={() => setIsSpotlightOpen(true)}
+            title={lang === 'bm' ? 'Carian pantas (Ctrl+K)' : 'Omnibox Spotlight search (Ctrl+K)'}
+          >
+            ⌘K
+          </button>
         </div>
 
         <div className="side-tabs" role="tablist">
@@ -270,7 +342,9 @@ function Shell() {
           )}
         </nav>
 
-        <div className="shortcut-hint">{t.shortcutHint}</div>
+        <div className="shortcut-hint">
+          {t.shortcutHint} · <span className="kbd-shortcut">Ctrl+K / ⌘K</span> {lang === 'bm' ? 'Spotlight' : 'Spotlight'}
+        </div>
       </aside>
 
       <main className="content">
@@ -280,6 +354,7 @@ function Shell() {
             onOpen={openSection}
             bookmarked={bookmarks.has(selected.id)}
             onToggleBookmark={() => bookmarks.toggle(selected.id)}
+            onShowToast={showToast}
           />
         ) : view?.kind === 'schedules' ? (
           <SchedulesView />
@@ -288,6 +363,14 @@ function Shell() {
         )}
       </main>
       <BackToTop />
+      <SpotlightSearch
+        isOpen={isSpotlightOpen}
+        onClose={() => setIsSpotlightOpen(false)}
+        onSelectSection={openSection}
+        allRegulations={allRegulations}
+        lang={lang}
+      />
+      {toastMessage && <div className="toast-popup">{toastMessage}</div>}
     </div>
   )
 }
@@ -467,11 +550,13 @@ function RegulationView({
   onOpen,
   bookmarked,
   onToggleBookmark,
+  onShowToast,
 }: {
   section: FlatRegulation
   onOpen: (id: string) => void
   bookmarked: boolean
   onToggleBookmark: () => void
+  onShowToast: (msg: string) => void
 }) {
   const { lang } = useLang()
   const t = UI[lang]
@@ -480,16 +565,39 @@ function RegulationView({
   const prev = idx > 0 ? allRegulations[idx - 1] : undefined
   const next = allRegulations[idx + 1]
 
+  const plainText = useMemo(() => extractSectionPlainText(loc), [loc])
+  const wordCount = useMemo(() => plainText.trim().split(/\s+/).filter(Boolean).length, [plainText])
+  const readingMinutes = Math.max(1, Math.ceil(wordCount / 180))
+
   const copyLink = useCallback(() => {
     navigator.clipboard?.writeText(window.location.href).catch(() => {})
-  }, [])
+    onShowToast(lang === 'bm' ? 'Pautan disalin!' : 'Link copied to clipboard!')
+  }, [onShowToast, lang])
+
+  const copyCitation = useCallback(() => {
+    const citation = `Customs Regulations 2019 [P.U. (A) 397/2019], r. ${section.number} — ${loc.heading}`
+    navigator.clipboard?.writeText(citation).catch(() => {})
+    onShowToast(lang === 'bm' ? 'Petikan peraturan disalin!' : 'Legal citation copied!')
+  }, [section.number, loc.heading, onShowToast, lang])
+
+  const copyMarkdown = useCallback(() => {
+    const md = `## Regulation ${section.number}: ${loc.heading}\n\n*Customs Regulations 2019 [P.U. (A) 397/2019]*\n\n${plainText}`
+    navigator.clipboard?.writeText(md).catch(() => {})
+    onShowToast(lang === 'bm' ? 'Teks Markdown disalin!' : 'Markdown copied!')
+  }, [section.number, loc.heading, plainText, onShowToast, lang])
 
   return (
     <article className="section-view">
-      <p className="crumb">
-        {t.partWord} {section.part.label}
-        {section.part.title ? ` — ${titleCase(partTitle(section.part, lang), lang)}` : ''}
-      </p>
+      <div className="section-meta-row">
+        <p className="crumb">
+          {t.partWord} {section.part.label}
+          {section.part.title ? ` — ${titleCase(partTitle(section.part, lang), lang)}` : ''}
+        </p>
+        <span className="reading-stat-badge">
+          ⏱️ ~{readingMinutes} {lang === 'bm' ? 'min bacaan' : 'min read'} · 📄 {wordCount} {lang === 'bm' ? 'patah perkataan' : 'words'}
+        </span>
+      </div>
+
       <div className="section-head">
         <div>
           <h2>
@@ -498,6 +606,25 @@ function RegulationView({
           <h3 className="sec-title">{loc.heading}</h3>
         </div>
         <div className="section-tools">
+          <AudioPlayer
+            title={`${t.secWord} ${section.number}: ${loc.heading}`}
+            text={plainText}
+            lang={lang}
+          />
+          <button
+            className="tool-btn"
+            onClick={copyCitation}
+            title={lang === 'bm' ? 'Salin petikan peraturan' : 'Copy legal citation'}
+          >
+            📋 {lang === 'bm' ? 'Petikan' : 'Cite'}
+          </button>
+          <button
+            className="tool-btn"
+            onClick={copyMarkdown}
+            title={lang === 'bm' ? 'Salin teks Markdown' : 'Copy clean Markdown'}
+          >
+            📄 MD
+          </button>
           <button
             className={`star-btn${bookmarked ? ' on' : ''}`}
             onClick={onToggleBookmark}
@@ -521,6 +648,9 @@ function RegulationView({
         </div>
       </div>
       <SectionBody section={loc} lang={lang} />
+
+      <OfficerNotes sectionId={section.id} lang={lang} />
+
       <div className="pager">
         {prev ? (
           <button className="pager-btn" onClick={() => onOpen(prev.id)}>

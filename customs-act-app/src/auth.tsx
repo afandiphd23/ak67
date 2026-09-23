@@ -126,7 +126,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
       const clientId =
         window.GOOGLE_CLIENT_ID ||
-        '1048293849182-customs-reader.apps.googleusercontent.com'
+        '969707902481-arou8v55frqagevuq99jua7t2tqqhosm.apps.googleusercontent.com'
 
       try {
         window.google.accounts.id.initialize({

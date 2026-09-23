@@ -8,11 +8,17 @@ import { LangProvider, useLang, UI, type Lang } from './i18n'
 import { ThemeProvider, useTheme } from './theme'
 import { useBookmarks, useTextSize, useTrackSection } from './hooks'
 
+import { AuthProvider, AuthGate, useAuth } from './auth'
+
 export default function App() {
   return (
     <ThemeProvider>
       <LangProvider>
-        <Shell />
+        <AuthProvider>
+          <AuthGate>
+            <Shell />
+          </AuthGate>
+        </AuthProvider>
       </LangProvider>
     </ThemeProvider>
   )
@@ -45,6 +51,7 @@ function getLandingUrl(): string {
 }
 
 function Shell() {
+  const { user, logout } = useAuth()
   const { lang, setLang } = useLang()
   const { theme, toggle } = useTheme()
   const t = UI[lang]
@@ -138,6 +145,21 @@ function Shell() {
               <span className="portal-arrow" aria-hidden="true">←</span>
               <span>{t.portalBtn}</span>
             </a>
+            {user && (
+              <div className="officer-portal-badge">
+                <span className="officer-email" title={user.email}>
+                  {user.email}
+                </span>
+                <button
+                  type="button"
+                  className="logout-mini-btn"
+                  onClick={logout}
+                  title={t.signOutBtn}
+                >
+                  {t.signOutBtn}
+                </button>
+              </div>
+            )}
           </div>
           <div className="brand-row">
             <h1>{t.brandTitle}</h1>

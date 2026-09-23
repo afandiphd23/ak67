@@ -8,7 +8,13 @@
       content="Bilingual digital readers for Malaysia's Customs Act 1967 and Customs Regulations 2019 — choose your reader."
     />
     <title>Customs Law Readers — Customs Act 1967 &amp; Regulations 2019</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script>
+      // Shared Google OAuth Web Client ID (Can be overridden by server/window environment)
+      window.GOOGLE_CLIENT_ID =
+        window.GOOGLE_CLIENT_ID ||
+        '1048293849182-customs-reader.apps.googleusercontent.com'
+
       // Apply saved theme + language before first paint to avoid flashes
       // (theme keys shared with both readers).
       try {
@@ -433,6 +439,198 @@
         }
       }
 
+      /* -------------------------------------------------------- auth gate */
+      .auth-gate-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(15, 17, 21, 0.85);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .auth-gate-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .auth-card {
+        width: 100%;
+        max-width: 480px;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+        padding: clamp(28px, 5vw, 42px);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .auth-crest {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 15px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      }
+
+      .auth-card h2 {
+        font-size: 23px;
+        margin: 0 0 8px;
+        color: var(--ink);
+      }
+
+      .auth-subtitle {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13.5px;
+        line-height: 1.55;
+        color: var(--muted);
+        margin: 0 0 20px;
+      }
+
+      .auth-domain-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(169, 133, 47, 0.12);
+        color: var(--gold);
+        border: 1px solid rgba(169, 133, 47, 0.3);
+        border-radius: 999px;
+        padding: 5px 14px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 22px;
+      }
+
+      .auth-error {
+        display: none;
+        background: rgba(138, 31, 45, 0.12);
+        border: 1px solid var(--act);
+        color: var(--act);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12.5px;
+        line-height: 1.45;
+        margin-bottom: 18px;
+        text-align: left;
+      }
+
+      .auth-error.visible {
+        display: block;
+      }
+
+      .auth-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .g-btn-wrapper {
+        min-height: 44px;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .demo-login-btn {
+        width: 100%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: none;
+        border: 1px dashed var(--line);
+        border-radius: 999px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .demo-login-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+        background: rgba(169, 133, 47, 0.05);
+      }
+
+      .officer-badge {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: rgba(169, 133, 47, 0.12);
+        border: 1px solid rgba(169, 133, 47, 0.3);
+        border-radius: 999px;
+        padding: 3px 12px 3px 4px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        color: var(--ink);
+      }
+
+      .officer-badge.visible {
+        display: inline-flex;
+      }
+
+      .officer-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--gold);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        overflow: hidden;
+      }
+
+      .officer-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .officer-email {
+        font-weight: 600;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .logout-btn {
+        display: none;
+      }
+
+      .logout-btn.visible {
+        display: inline-block;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         * {
           transition: none !important;
@@ -461,6 +659,14 @@
         </span>
       </div>
       <div class="controls">
+        <div class="officer-badge" id="officer-badge">
+          <div class="officer-avatar" id="officer-avatar">🛡️</div>
+          <span class="officer-email" id="officer-email">officer@customs.gov.my</span>
+        </div>
+        <button class="top-btn logout-btn" id="btn-logout" type="button">
+          <span class="en">Sign Out</span>
+          <span class="bm">Log Keluar</span>
+        </button>
         <button class="top-btn" id="btn-en" type="button">EN</button>
         <button class="top-btn" id="btn-bm" type="button">BM</button>
         <button class="top-btn" id="btn-theme" type="button" aria-label="Toggle dark mode">◐</button>
@@ -619,11 +825,212 @@
           'card-act': 'http://localhost:5174/',
           'card-reg': 'http://localhost:5175/',
         }
-        Object.keys(portMap).forEach(function (id) {
-          var el = document.getElementById(id)
-          if (el) el.href = portMap[id]
+      }
+
+      // ---------------------------------------------------------- auth
+      var AUTH_KEY = 'customs_auth_user'
+      var authGate = document.getElementById('auth-gate-modal')
+      var authError = document.getElementById('auth-error')
+      var officerBadge = document.getElementById('officer-badge')
+      var officerAvatar = document.getElementById('officer-avatar')
+      var officerEmail = document.getElementById('officer-email')
+      var btnLogout = document.getElementById('btn-logout')
+      var btnDemoLogin = document.getElementById('btn-demo-login')
+
+      function parseJwt(token) {
+        try {
+          var base64Url = token.split('.')[1]
+          var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+          var jsonPayload = decodeURIComponent(
+            atob(base64)
+              .split('')
+              .map(function (c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+              })
+              .join(''),
+          )
+          return JSON.parse(jsonPayload)
+        } catch (e) {
+          return null
+        }
+      }
+
+      function getAuthUser() {
+        try {
+          var raw = localStorage.getItem(AUTH_KEY)
+          if (!raw) return null
+          var u = JSON.parse(raw)
+          if (u && u.email && u.email.toLowerCase().endsWith('@customs.gov.my')) {
+            return u
+          }
+          return null
+        } catch (e) {
+          return null
+        }
+      }
+
+      function setAuthUser(user) {
+        try {
+          if (user) {
+            localStorage.setItem(AUTH_KEY, JSON.stringify(user))
+          } else {
+            localStorage.removeItem(AUTH_KEY)
+          }
+        } catch (e) {}
+        updateAuthUI()
+      }
+
+      function updateAuthUI() {
+        var user = getAuthUser()
+        if (user) {
+          authGate.classList.add('hidden')
+          officerBadge.classList.add('visible')
+          btnLogout.classList.add('visible')
+          officerEmail.textContent = user.email
+          if (user.picture) {
+            officerAvatar.innerHTML = '<img src="' + user.picture + '" alt="Avatar" />'
+          } else {
+            officerAvatar.textContent = (user.name || user.email || 'O').charAt(0).toUpperCase()
+          }
+          if (authError) authError.classList.remove('visible')
+        } else {
+          authGate.classList.remove('hidden')
+          officerBadge.classList.remove('visible')
+          btnLogout.classList.remove('visible')
+          initGoogleSignIn()
+        }
+      }
+
+      function handleCredentialResponse(response) {
+        if (!response || !response.credential) return
+        var payload = parseJwt(response.credential)
+        if (!payload || !payload.email) {
+          showAuthError('Gagal memproses token log masuk Google. / Failed to parse token.')
+          return
+        }
+
+        var email = payload.email.toLowerCase().trim()
+        if (email.endsWith('@customs.gov.my')) {
+          var user = {
+            email: email,
+            name: payload.name || 'Pegawai JKDM',
+            picture: payload.picture || '',
+            sub: payload.sub,
+            authTime: Date.now(),
+          }
+          setAuthUser(user)
+        } else {
+          showAuthError(
+            'Akaun tidak dibenarkan: ' +
+              email +
+              '. Akses terhad kepada warga Jabatan Kastam Diraja Malaysia (@customs.gov.my) sahaja.',
+          )
+        }
+      }
+
+      function showAuthError(msg) {
+        if (!authError) return
+        authError.textContent = msg
+        authError.classList.add('visible')
+      }
+
+      function initGoogleSignIn() {
+        if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+          setTimeout(initGoogleSignIn, 300)
+          return
+        }
+        try {
+          google.accounts.id.initialize({
+            client_id: window.GOOGLE_CLIENT_ID,
+            callback: handleCredentialResponse,
+            auto_select: false,
+            cancel_on_tap_outside: false,
+          })
+          var btnContainer = document.getElementById('google-btn-container')
+          if (btnContainer) {
+            google.accounts.id.renderButton(btnContainer, {
+              theme: document.documentElement.dataset.theme === 'dark' ? 'filled_black' : 'outline',
+              size: 'large',
+              shape: 'pill',
+              width: 300,
+              text: 'signin_with',
+            })
+          }
+        } catch (e) {
+          console.warn('Google Identity initialization error:', e)
+        }
+      }
+
+      btnLogout.addEventListener('click', function () {
+        setAuthUser(null)
+      })
+
+      if (btnDemoLogin) {
+        btnDemoLogin.addEventListener('click', function () {
+          var email = prompt(
+            'Masukkan e-mel rasmi @customs.gov.my anda / Enter your official @customs.gov.my email:',
+            'pegawai@customs.gov.my',
+          )
+          if (!email) return
+          email = email.toLowerCase().trim()
+          if (!email.endsWith('@customs.gov.my')) {
+            showAuthError(
+              'Akaun tidak sah: ' +
+                email +
+                '. Sila gunakan alamat e-mel berakhiran @customs.gov.my.',
+            )
+            return
+          }
+          setAuthUser({
+            email: email,
+            name: email.split('@')[0].replace('.', ' ').toUpperCase(),
+            picture: '',
+            authTime: Date.now(),
+          })
         })
       }
+
+      window.addEventListener('storage', function (e) {
+        if (e.key === AUTH_KEY) updateAuthUI()
+      })
+
+      // Initial check
+      updateAuthUI()
     </script>
+
+    <!-- Auth Gate Modal -->
+    <div class="auth-gate-overlay" id="auth-gate-modal">
+      <div class="auth-card">
+        <div class="auth-crest">JKDM</div>
+        <h2>
+          <span class="en">Official Law Readers</span>
+          <span class="bm">Pembaca Undang-Undang Rasmi</span>
+        </h2>
+        <p class="auth-subtitle">
+          <span class="en">
+            Access to the Customs Act 1967 and Customs Regulations 2019 readers is restricted to
+            authorized officers.
+          </span>
+          <span class="bm">
+            Akses kepada pembaca Akta Kastam 1967 dan Peraturan-Peraturan Kastam 2019 dikhaskan untuk
+            pegawai yang diberi kuasa.
+          </span>
+        </p>
+        <div>
+          <span class="auth-domain-pill">🔒 @customs.gov.my</span>
+        </div>
+
+        <div class="auth-error" id="auth-error"></div>
+
+        <div class="auth-actions">
+          <div class="g-btn-wrapper" id="google-btn-container"></div>
+          <button class="demo-login-btn" id="btn-demo-login" type="button">
+            ⚡
+            <span class="en">Officer Verification Sign-In (Demo / Test)</span>
+            <span class="bm">Pengesahan Pegawai (Ujian / Demo)</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

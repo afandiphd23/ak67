@@ -22,9 +22,10 @@ function run(cmd, cwd) {
   const res = spawnSync(cmd, {
     cwd,
     stdio: 'inherit',
-    shell: process.platform === 'win32',
+    shell: true,
   })
-  if (res.status !== 0) {
+  if (res.status !== 0 || res.error) {
+    if (res.error) console.error(res.error)
     console.error(`\n✗ failed: ${cmd} (in ${cwd})`)
     process.exit(res.status ?? 1)
   }

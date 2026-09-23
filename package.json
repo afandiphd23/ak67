@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "type": "module",
   "description": "Customs Law Readers suite: landing page + Customs Act 1967 reader + Customs Regulations 2019 reader",
+  "workspaces": [
+    "customs-act-app",
+    "customs-reg-app"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build-site.mjs",

@@ -581,6 +581,47 @@ body {
   width: 100%;
 }
 
+.custom-google-btn {
+  width: 100%;
+  max-width: 300px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 999px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.custom-google-btn:hover {
+  background: #f8f9fa;
+  border-color: #d2e3fc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.custom-google-btn:active {
+  background: #eeeeee;
+}
+
+[data-theme='dark'] .custom-google-btn {
+  background: #131314;
+  color: #e3e3e3;
+  border-color: #444746;
+}
+
+[data-theme='dark'] .custom-google-btn:hover {
+  background: #1f1f20;
+  border-color: #8ab4f8;
+}
+
 .demo-login-btn {
   width: 100%;
   display: inline-flex;

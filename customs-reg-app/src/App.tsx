@@ -52,7 +52,7 @@ function getLandingUrl(): string {
 function Shell() {
   const { user, logout } = useAuth()
   const { lang, setLang } = useLang()
-  const { theme, toggle } = useTheme()
+  const { toggle, currentThemeMeta } = useTheme()
   const t = UI[lang]
 
   const [view, setView] = useState<View | null>(parseHash)
@@ -186,10 +186,10 @@ function Shell() {
               <button
                 className="theme-toggle"
                 onClick={toggle}
-                title={theme === 'dark' ? t.themeBtnTitleDark : t.themeBtnTitleLight}
-                aria-label={theme === 'dark' ? t.themeBtnTitleDark : t.themeBtnTitleLight}
+                title={`${lang === 'bm' ? 'Tukar tema' : 'Switch theme'} (${lang === 'bm' ? currentThemeMeta.nameBm : currentThemeMeta.nameEn})`}
+                aria-label={`${lang === 'bm' ? 'Tukar tema' : 'Switch theme'} (${lang === 'bm' ? currentThemeMeta.nameBm : currentThemeMeta.nameEn})`}
               >
-                {theme === 'dark' ? '☀' : '☾'}
+                {currentThemeMeta.icon}
               </button>
               <button
                 className="lang-toggle"

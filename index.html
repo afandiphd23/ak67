@@ -18,20 +18,23 @@
       // Apply saved theme + language before first paint to avoid flashes
       // (theme keys shared with both readers).
       try {
+        var validThemes = ['light', 'sepia', 'dark', 'navy', 'emerald']
         var t = localStorage.getItem('customs-act-theme') || localStorage.getItem('customs-reg-theme')
-        if (t !== 'dark' && t !== 'light') {
+        if (!validThemes.includes(t)) {
           t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
             ? 'dark'
             : 'light'
         }
         document.documentElement.dataset.theme = t
-        document.documentElement.style.colorScheme = t
+        document.documentElement.style.colorScheme =
+          t === 'light' || t === 'sepia' ? 'light' : 'dark'
       } catch (e) {
         /* ignore */
       }
     </script>
     <style>
-      :root {
+      :root,
+      [data-theme='light'] {
         --bg: #f2efe6;
         --ink: #20262e;
         --muted: #6d7480;
@@ -47,6 +50,18 @@
         --header-h: 64px;
       }
 
+      [data-theme='sepia'] {
+        --bg: #f4ecd8;
+        --ink: #382c1e;
+        --muted: #7c6d5b;
+        --line: #dfd2b8;
+        --gold: #ad7c2b;
+        --act: #9c381e;
+        --act-soft: rgba(156, 56, 30, 0.08);
+        --reg: #1f646b;
+        --reg-soft: rgba(31, 100, 107, 0.08);
+      }
+
       [data-theme='dark'] {
         --bg: #14161a;
         --ink: #e6e3da;
@@ -58,6 +73,32 @@
         --act-soft: rgba(208, 135, 148, 0.07);
         --reg: #7fb8b3;          /* sage teal         */
         --reg-soft: rgba(127, 184, 179, 0.07);
+      }
+
+      [data-theme='navy'] {
+        --bg: #0b1320;
+        --ink: #e2e8f0;
+        --muted: #8b9bb4;
+        --line: #1e2e4a;
+        --gold: #f59e0b;
+
+        --act: #f472b6;          /* coral rose        */
+        --act-soft: rgba(244, 114, 182, 0.08);
+        --reg: #5eead4;          /* luminous teal     */
+        --reg-soft: rgba(94, 234, 212, 0.08);
+      }
+
+      [data-theme='emerald'] {
+        --bg: #0d1a16;
+        --ink: #e6f4ea;
+        --muted: #8ba89a;
+        --line: #1f3d32;
+        --gold: #fcd34d;
+
+        --act: #fca5a5;          /* soft berry        */
+        --act-soft: rgba(252, 165, 165, 0.08);
+        --reg: #6ee7b7;          /* mint emerald      */
+        --reg-soft: rgba(110, 231, 183, 0.08);
       }
 
       * {
@@ -837,11 +878,41 @@
       setLang(body.dataset.lang === 'bm' ? 'bm' : 'en')
 
       // ---------------------------------------------------------- theme
+      var themes = [
+        { id: 'light', icon: '☀️', nameEn: 'Light', nameBm: 'Cerah' },
+        { id: 'sepia', icon: '📜', nameEn: 'Sepia', nameBm: 'Sepia' },
+        { id: 'dark', icon: '🌙', nameEn: 'Dark', nameBm: 'Gelap' },
+        { id: 'navy', icon: '🌌', nameEn: 'Midnight', nameBm: 'Malam' },
+        { id: 'emerald', icon: '🌿', nameEn: 'Forest', nameBm: 'Hutan' },
+      ]
       var btnTheme = document.getElementById('btn-theme')
+
+      function updateThemeBtn() {
+        var current = document.documentElement.dataset.theme || 'light'
+        var tObj =
+          themes.find(function (t) {
+            return t.id === current
+          }) || themes[0]
+        var isBm = document.body.dataset.lang === 'bm'
+        btnTheme.textContent = tObj.icon
+        btnTheme.title =
+          (isBm ? 'Tukar tema: ' : 'Theme: ') + (isBm ? tObj.nameBm : tObj.nameEn)
+        btnTheme.setAttribute(
+          'aria-label',
+          (isBm ? 'Tukar tema: ' : 'Theme: ') + (isBm ? tObj.nameBm : tObj.nameEn),
+        )
+      }
+
       btnTheme.addEventListener('click', function () {
-        var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+        var current = document.documentElement.dataset.theme || 'light'
+        var idx = themes.findIndex(function (t) {
+          return t.id === current
+        })
+        if (idx === -1) idx = 0
+        var next = themes[(idx + 1) % themes.length].id
         document.documentElement.dataset.theme = next
-        document.documentElement.style.colorScheme = next
+        document.documentElement.style.colorScheme =
+          next === 'light' || next === 'sepia' ? 'light' : 'dark'
         try {
           // Sync both readers so the whole suite feels coherent.
           localStorage.setItem('customs-act-theme', next)
@@ -849,7 +920,9 @@
         } catch (e) {
           /* ignore */
         }
+        updateThemeBtn()
       })
+      updateThemeBtn()
 
       // ---------------------------------------------------------- links
       // In production this page is the suite root and the readers live in

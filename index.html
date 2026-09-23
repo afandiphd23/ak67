@@ -3,11 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Customs Act 1967 (Act 235)</title>
+    <meta
+      name="description"
+      content="Bilingual digital readers for Malaysia's Customs Act 1967 and Customs Regulations 2019 — choose your reader."
+    />
+    <title>Customs Law Readers — Customs Act 1967 &amp; Regulations 2019</title>
     <script>
-      // Apply the saved theme before first paint to avoid a flash.
+      // Apply saved theme + language before first paint to avoid flashes
+      // (theme keys shared with both readers).
       try {
-        var t = localStorage.getItem('customs-act-theme')
+        var t = localStorage.getItem('customs-act-theme') || localStorage.getItem('customs-reg-theme')
         if (t !== 'dark' && t !== 'light') {
           t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
             ? 'dark'
@@ -19,9 +24,606 @@
         /* ignore */
       }
     </script>
+    <style>
+      :root {
+        --bg: #f2efe6;
+        --ink: #20262e;
+        --muted: #6d7480;
+        --line: #ddd7c8;
+        --gold: #a9852f;
+
+        /* Per-door accents */
+        --act: #8a1f2d;          /* customs red       */
+        --act-soft: rgba(138, 31, 45, 0.06);
+        --reg: #1e5a60;          /* deep petrol       */
+        --reg-soft: rgba(30, 90, 96, 0.06);
+
+        --header-h: 64px;
+      }
+
+      [data-theme='dark'] {
+        --bg: #14161a;
+        --ink: #e6e3da;
+        --muted: #9aa0a8;
+        --line: #2e323a;
+        --gold: #c9a961;
+
+        --act: #d08794;          /* dusty rose        */
+        --act-soft: rgba(208, 135, 148, 0.07);
+        --reg: #7fb8b3;          /* sage teal         */
+        --reg-soft: rgba(127, 184, 179, 0.07);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+        background: var(--bg);
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ui {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+      }
+
+      /* Bilingual visibility (same pattern as the readers) */
+      .bm {
+        display: none;
+      }
+      body[data-lang='bm'] .en {
+        display: none;
+      }
+      body[data-lang='bm'] .bm {
+        display: inline;
+      }
+      body[data-lang='bm'] .bm.block {
+        display: block;
+      }
+
+      /* ------------------------------------------------------------- header */
+
+      .topbar {
+        height: var(--header-h);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 clamp(16px, 4vw, 40px);
+        border-bottom: 1px solid var(--line);
+        flex: none;
+      }
+
+      .wordmark {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13.5px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+      }
+
+      .mini-crest {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: var(--bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 9.5px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .top-btn {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: var(--muted);
+        background: none;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 14px;
+        cursor: pointer;
+        transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      }
+
+      .top-btn:hover {
+        color: var(--gold);
+        border-color: var(--gold);
+      }
+
+      .top-btn.active {
+        color: var(--ink);
+        border-color: var(--ink);
+        background: rgba(127, 127, 127, 0.08);
+      }
+
+      /* ------------------------------------------------------------- stage */
+
+      .stage {
+        flex: 1;
+        display: flex;
+        align-items: stretch;
+        min-height: 0;
+      }
+
+      /* One "door" = one app */
+      .door {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: clamp(28px, 5vw, 64px);
+        text-decoration: none;
+        color: inherit;
+        overflow: hidden;
+        transition: background 0.25s ease;
+      }
+
+      .door-act {
+        --accent: var(--act);
+        --accent-soft: var(--act-soft);
+      }
+
+      .door-reg {
+        --accent: var(--reg);
+        --accent-soft: var(--reg-soft);
+      }
+
+      .door:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: -3px;
+      }
+
+      .door:hover,
+      .door:focus-visible {
+        background: var(--accent-soft);
+      }
+
+      /* Mirror the composition: content of the right door hugs the right edge */
+      .door-reg .door-inner {
+        margin-left: auto;
+      }
+
+      .door-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 560px;
+      }
+
+      /* Giant gazette citation numeral in the background */
+      .door-numeral {
+        position: absolute;
+        z-index: 0;
+        right: -0.04em;
+        bottom: -0.22em;
+        font-size: clamp(140px, 24vw, 340px);
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--accent);
+        opacity: 0.09;
+        user-select: none;
+        pointer-events: none;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+      }
+
+      .door:hover .door-numeral,
+      .door:focus-visible .door-numeral {
+        transform: translateY(-10px);
+        opacity: 0.16;
+      }
+
+      .kicker {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin: 0 0 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .kicker::after {
+        content: '';
+        height: 1px;
+        width: 44px;
+        background: var(--gold);
+        opacity: 0.6;
+      }
+
+      .door h1 {
+        font-size: clamp(26px, 3.4vw, 42px);
+        line-height: 1.15;
+        margin: 0 0 6px;
+        color: var(--accent);
+        transition: letter-spacing 0.3s ease;
+      }
+
+      .door:hover h1 {
+        letter-spacing: 0.01em;
+      }
+
+      .citation {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12.5px;
+        letter-spacing: 0.4px;
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .door .lede {
+        font-size: 15.5px;
+        line-height: 1.7;
+        color: var(--muted);
+        margin: 0 0 26px;
+        max-width: 46ch;
+      }
+
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 26px;
+        padding: 16px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .stats strong {
+        display: block;
+        font-family: Georgia, serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--accent);
+        line-height: 1.1;
+      }
+
+      .cta {
+        margin-top: 24px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13.5px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .cta .ring {
+        width: 34px;
+        height: 34px;
+        border: 1.5px solid var(--accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      }
+
+      .door:hover .cta .ring,
+      .door:focus-visible .cta .ring {
+        background: var(--accent);
+        color: var(--bg);
+        transform: translateX(4px);
+      }
+
+      /* -------------------------------------------------------- divider */
+
+      .divider {
+        flex: none;
+        width: 1px;
+        background: var(--line);
+        position: relative;
+      }
+
+      .divider .badge {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: var(--bg);
+        border: 1px solid var(--line);
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      /* ---------------------------------------------------------- footer */
+
+      .foot {
+        flex: none;
+        border-top: 1px solid var(--line);
+        padding: 14px clamp(16px, 4vw, 40px);
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .foot strong {
+        color: var(--ink);
+      }
+
+      .foot a {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .foot a:hover {
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+      }
+
+      /* ---------------------------------------------------------- mobile */
+
+      @media (max-width: 860px) {
+        .stage {
+          flex-direction: column;
+          overflow-y: auto;
+        }
+
+        .divider {
+          width: auto;
+          height: 1px;
+        }
+
+        .door {
+          min-height: 46vh;
+          padding: 32px 22px 40px;
+        }
+
+        .door-reg .door-inner {
+          margin-left: 0;
+        }
+
+        .door-numeral {
+          font-size: clamp(120px, 34vw, 200px);
+          bottom: -0.14em;
+        }
+
+        .foot {
+          justify-content: center;
+          text-align: center;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body data-lang="en">
+    <script>
+      // Restore language before paint (same key as before).
+      try {
+        if (localStorage.getItem('customs-portal-lang') === 'bm') {
+          document.body.dataset.lang = 'bm'
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    </script>
+
+    <header class="topbar">
+      <div class="wordmark">
+        <span class="mini-crest">JKDM</span>
+        <span>
+          <span class="en">Customs Law Readers</span>
+          <span class="bm">Pembaca Undang-Undang Kastam</span>
+        </span>
+      </div>
+      <div class="controls">
+        <button class="top-btn" id="btn-en" type="button">EN</button>
+        <button class="top-btn" id="btn-bm" type="button">BM</button>
+        <button class="top-btn" id="btn-theme" type="button" aria-label="Toggle dark mode">◐</button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <!-- Door 1 — Customs Act 1967 -->
+      <a class="door door-act" id="card-act" href="customs-act-app/">
+        <span class="door-numeral" aria-hidden="true">235</span>
+        <div class="door-inner">
+          <p class="kicker">
+            <span class="en">Primary legislation</span>
+            <span class="bm">Perundangan utama</span>
+          </p>
+          <h1>
+            <span class="en">Customs Act 1967</span>
+            <span class="bm">Akta Kastam 1967</span>
+          </h1>
+          <p class="citation">
+            <span class="en">Laws of Malaysia · Act 235</span>
+            <span class="bm">Undang-Undang Malaysia · Akta 235</span>
+          </p>
+          <p class="lede">
+            <span class="en">
+              The principal customs statute — levy of customs duties, prohibition of imports and
+              exports, offences, and enforcement powers.
+            </span>
+            <span class="bm">
+              Undang-undang utama kastam — pengenaan duti kastam, larangan import dan eksport,
+              kesalahan, dan kuasa penguatkuasaan.
+            </span>
+          </p>
+          <div class="stats">
+            <span><strong>29</strong><span class="en">parts</span><span class="bm">bahagian</span></span>
+            <span><strong>298</strong><span class="en">sections</span><span class="bm">seksyen</span></span>
+            <span><strong>1</strong><span class="en">schedule</span><span class="bm">jadual</span></span>
+          </div>
+          <span class="cta">
+            <span class="en">Open the reader</span>
+            <span class="bm">Buka pembaca</span>
+            <span class="ring">→</span>
+          </span>
+        </div>
+      </a>
+
+      <div class="divider" aria-hidden="true">
+        <span class="badge">JKDM</span>
+      </div>
+
+      <!-- Door 2 — Customs Regulations 2019 -->
+      <a class="door door-reg" id="card-reg" href="customs-reg-app/">
+        <span class="door-numeral" aria-hidden="true">397</span>
+        <div class="door-inner">
+          <p class="kicker">
+            <span class="en">Subsidiary legislation</span>
+            <span class="bm">Perundangan subsidiari</span>
+          </p>
+          <h1>
+            <span class="en">Customs Regulations 2019</span>
+            <span class="bm">Peraturan-Peraturan Kastam 2019</span>
+          </h1>
+          <p class="citation">
+            <span class="en">P.U. (A) 397 · under the Customs Act 1967</span>
+            <span class="bm">P.U. (A) 397 · di bawah Akta Kastam 1967</span>
+          </p>
+          <p class="lede">
+            <span class="en">
+              Regulations made under section 142 of the Act — customs zones, warehousing,
+              procedure, agents, and shipping agents.
+            </span>
+            <span class="bm">
+              Peraturan yang dibuat di bawah seksyen 142 Akta — kawasan kastam, gudang, prosedur,
+              ejen, dan ejen perkapalan.
+            </span>
+          </p>
+          <div class="stats">
+            <span><strong>14</strong><span class="en">parts</span><span class="bm">bahagian</span></span>
+            <span><strong>60</strong><span class="en">regulations</span><span class="bm">peraturan</span></span>
+            <span><strong>6</strong><span class="en">schedules</span><span class="bm">jadual</span></span>
+          </div>
+          <span class="cta">
+            <span class="en">Open the reader</span>
+            <span class="bm">Buka pembaca</span>
+            <span class="ring">→</span>
+          </span>
+        </div>
+      </a>
+    </main>
+
+    <footer class="foot">
+      <span>
+        <span class="en">Digital readers prepared by</span>
+        <span class="bm">Pembaca digital disediakan oleh</span>
+        <strong>Dr.Fendi Ameen</strong>
+        · <a href="mailto:afandi.amin@customs.gov.my">afandi.amin@customs.gov.my</a>
+      </span>
+      <span>
+        <span class="en">Texts sourced from the official gazette. For reference only — consult the printed law for legal use.</span>
+        <span class="bm">Teks daripada warta rasmi. Untuk rujukan sahaja — rujuk cetakan rasmi untuk kegunaan undang-undang.</span>
+      </span>
+    </footer>
+
+    <script>
+      // ---------------------------------------------------------- language
+      var body = document.body
+      var btnEn = document.getElementById('btn-en')
+      var btnBm = document.getElementById('btn-bm')
+
+      function setLang(lang) {
+        body.dataset.lang = lang
+        btnEn.classList.toggle('active', lang === 'en')
+        btnBm.classList.toggle('active', lang === 'bm')
+        try {
+          localStorage.setItem('customs-portal-lang', lang)
+        } catch (e) {
+          /* ignore */
+        }
+      }
+
+      btnEn.addEventListener('click', function () {
+        setLang('en')
+      })
+      btnBm.addEventListener('click', function () {
+        setLang('bm')
+      })
+      setLang(body.dataset.lang === 'bm' ? 'bm' : 'en')
+
+      // ---------------------------------------------------------- theme
+      var btnTheme = document.getElementById('btn-theme')
+      btnTheme.addEventListener('click', function () {
+        var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+        document.documentElement.dataset.theme = next
+        document.documentElement.style.colorScheme = next
+        try {
+          // Sync both readers so the whole suite feels coherent.
+          localStorage.setItem('customs-act-theme', next)
+          localStorage.setItem('customs-reg-theme', next)
+        } catch (e) {
+          /* ignore */
+        }
+      })
+
+      // ---------------------------------------------------------- links
+      // In production this page is the suite root and the readers live in
+      // the sibling folders customs-act-app/ and customs-reg-app/ — the
+      // static hrefs above are already correct. In dev (this page served
+      // by its own Vite server on 5173), the readers run on pinned ports
+      // 5174/5175, so rewrite to the dev URLs.
+      var isDev =
+        location.hostname === 'localhost' ||
+        location.hostname === '127.0.0.1' ||
+        location.hostname === '[::1]'
+      if (isDev && location.port === '5173') {
+        var portMap = {
+          'card-act': 'http://localhost:5174/',
+          'card-reg': 'http://localhost:5175/',
+        }
+        Object.keys(portMap).forEach(function (id) {
+          var el = document.getElementById(id)
+          if (el) el.href = portMap[id]
+        })
+      }
+    </script>
   </body>
 </html>

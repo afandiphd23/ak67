@@ -1,24 +1,20 @@
 {
-  "name": "customs-act-app",
+  "name": "ak67-suite",
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "description": "Customs Law Readers suite: landing page + Customs Act 1967 reader + Customs Regulations 2019 reader",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview",
-    "gen:data": "node scripts/generate-data.mjs",
-    "deploy": "npm run build && node scripts/zip-dist.mjs"
-  },
-  "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "build": "node scripts/build-site.mjs",
+    "dev:act": "npm run dev --prefix customs-act-app",
+    "dev:reg": "npm run dev --prefix customs-reg-app",
+    "deploy:act": "npm run deploy --prefix customs-act-app",
+    "deploy:reg": "npm run deploy --prefix customs-reg-app",
+    "gen:data:act": "npm run gen:data --prefix customs-act-app",
+    "gen:data:reg": "npm run gen:data --prefix customs-reg-app"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "~5.7.2",
     "vite": "^6.0.0"
   }
 }

@@ -1,13 +1,12 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// Relative base so the built app works at a domain root OR any subfolder
-// (e.g. public_html/ or public_html/customs-act/) without rebuilding.
+// Dev server for the landing page only (the readers run their own dev
+// servers on 5174 / 5175 from their folders). The landing rewrites its
+// card links to those dev URLs only when served on this port.
 export default defineConfig({
-  plugins: [react()],
   base: './',
   server: {
-    port: 5174,
+    port: 5173,
     strictPort: true,
   },
 })

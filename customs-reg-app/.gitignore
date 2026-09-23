@@ -1,0 +1,4 @@
+node_modules/
+dist/
+customs-reg-dist.zip
+vite-dev.log

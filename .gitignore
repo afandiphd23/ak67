@@ -1,4 +1,11 @@
 node_modules/
 dist/
-customs-act-dist.zip
-vite-dev.log
+site/
+*-dist.zip
+*.log
+shots/
+
+# Heavy local source artifacts (gazette PDFs + extracted text used by the
+# gen:data pipelines); the parsed JSON is committed, so these stay local.
+/*.pdf
+/*.txt

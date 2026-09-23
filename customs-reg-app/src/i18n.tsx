@@ -54,6 +54,8 @@ export const UI = {
   en: {
     brandTitle: 'Customs Regulations 2019',
     brandSub: 'P.U. (A) 397 · under the Customs Act 1967',
+    portalBtn: 'All Readers',
+    portalBtnTitle: 'Back to Customs Law Readers landing page',
     creatorLabel: 'by Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'Email the creator: afandi.amin@customs.gov.my',
@@ -117,6 +119,8 @@ export const UI = {
   bm: {
     brandTitle: 'Peraturan-Peraturan Kastam 2019',
     brandSub: 'P.U. (A) 397 · di bawah Akta Kastam 1967',
+    portalBtn: 'Semua Pembaca',
+    portalBtnTitle: 'Kembali ke laman utama Pembaca Undang-Undang Kastam',
     creatorLabel: 'oleh Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'E-mel pencipta: afandi.amin@customs.gov.my',

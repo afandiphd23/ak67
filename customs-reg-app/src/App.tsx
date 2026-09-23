@@ -31,6 +31,18 @@ function parseHash(): View | null {
   return null
 }
 
+function getLandingUrl(): string {
+  if (typeof window === 'undefined') return '../'
+  const isDev =
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '[::1]'
+  if (isDev && (window.location.port === '5174' || window.location.port === '5175')) {
+    return 'http://localhost:5173/'
+  }
+  return '../'
+}
+
 function Shell() {
   const { lang, setLang } = useLang()
   const { theme, toggle } = useTheme()
@@ -120,6 +132,12 @@ function Shell() {
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
+          <div className="brand-portal">
+            <a href={getLandingUrl()} className="portal-link" title={t.portalBtnTitle}>
+              <span className="portal-arrow" aria-hidden="true">←</span>
+              <span>{t.portalBtn}</span>
+            </a>
+          </div>
           <div className="brand-row">
             <h1>{t.brandTitle}</h1>
             <div className="brand-actions">

@@ -54,6 +54,8 @@ export const UI = {
   en: {
     brandTitle: 'Customs Act 1967',
     brandSub: 'Laws of Malaysia · Act 235',
+    portalBtn: 'All Readers',
+    portalBtnTitle: 'Back to Customs Law Readers landing page',
     creatorLabel: 'by Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'Email the creator: afandi.amin@customs.gov.my',
@@ -120,6 +122,8 @@ export const UI = {
   bm: {
     brandTitle: 'Akta Kastam 1967',
     brandSub: 'Undang-Undang Malaysia · Akta 235',
+    portalBtn: 'Semua Pembaca',
+    portalBtnTitle: 'Kembali ke laman utama Pembaca Undang-Undang Kastam',
     creatorLabel: 'oleh Dr.Fendi Ameen',
     creatorEmail: 'afandi.amin@customs.gov.my',
     creatorTitle: 'E-mel pencipta: afandi.amin@customs.gov.my',

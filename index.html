@@ -107,7 +107,7 @@
 
       html,
       body {
-        height: 100%;
+        min-height: 100%;
       }
 
       body {
@@ -150,6 +150,12 @@
         padding: 0 clamp(16px, 4vw, 40px);
         border-bottom: 1px solid var(--line);
         flex: none;
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        background: color-mix(in srgb, var(--bg) 92%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
       .wordmark {
@@ -207,82 +213,7 @@
         background: rgba(127, 127, 127, 0.08);
       }
 
-      /* ------------------------------------------------------------- stage */
-
-      .stage {
-        flex: 1;
-        display: flex;
-        align-items: stretch;
-        min-height: 0;
-      }
-
-      /* One "door" = one app */
-      .door {
-        position: relative;
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding: clamp(28px, 5vw, 64px);
-        text-decoration: none;
-        color: inherit;
-        overflow: hidden;
-        transition: background 0.25s ease;
-      }
-
-      .door-act {
-        --accent: var(--act);
-        --accent-soft: var(--act-soft);
-      }
-
-      .door-reg {
-        --accent: var(--reg);
-        --accent-soft: var(--reg-soft);
-      }
-
-      .door:focus-visible {
-        outline: 3px solid var(--accent);
-        outline-offset: -3px;
-      }
-
-      .door:hover,
-      .door:focus-visible {
-        background: var(--accent-soft);
-      }
-
-      /* Mirror the composition: content of the right door hugs the right edge */
-      .door-reg .door-inner {
-        margin-left: auto;
-      }
-
-      .door-inner {
-        position: relative;
-        z-index: 1;
-        max-width: 560px;
-      }
-
-      /* Giant gazette citation numeral in the background */
-      .door-numeral {
-        position: absolute;
-        z-index: 0;
-        right: -0.04em;
-        bottom: -0.22em;
-        font-size: clamp(140px, 24vw, 340px);
-        line-height: 1;
-        font-weight: 700;
-        letter-spacing: -0.02em;
-        color: var(--accent);
-        opacity: 0.09;
-        user-select: none;
-        pointer-events: none;
-        transition: transform 0.4s ease, opacity 0.4s ease;
-      }
-
-      .door:hover .door-numeral,
-      .door:focus-visible .door-numeral {
-        transform: translateY(-10px);
-        opacity: 0.16;
-      }
+      /* ------------------------------------------------------------- kicker */
 
       .kicker {
         font-family: 'Segoe UI', system-ui, sans-serif;
@@ -386,97 +317,496 @@
         transform: translateX(4px);
       }
 
-      /* -------------------------------------------------------- divider */
-
-      .divider {
-        flex: none;
-        width: 1px;
-        background: var(--line);
-        position: relative;
-      }
-
-      .divider .badge {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 58px;
-        height: 58px;
-        border-radius: 50%;
-        background: var(--bg);
-        border: 1px solid var(--line);
-        color: var(--gold);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-        font-size: 13px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
-      }
-
       /* ---------------------------------------------------------- footer */
 
-      .foot {
-        flex: none;
+      .foot-base {
         border-top: 1px solid var(--line);
         padding: 14px clamp(16px, 4vw, 40px);
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
         gap: 12px;
         flex-wrap: wrap;
-        font-family: 'Segoe UI', system-ui, sans-serif;
-        font-size: 12px;
-        color: var(--muted);
+        font-size: 11px;
       }
 
-      .foot strong {
+      .foot-base strong {
         color: var(--ink);
       }
 
-      .foot a {
+      .foot-base a {
         color: inherit;
         text-decoration: none;
         border-bottom: 1px solid var(--line);
       }
 
-      .foot a:hover {
+      .foot-base a:hover {
         color: var(--gold);
         border-bottom-color: var(--gold);
+      }
+
+      /* ------------------------------------------------------- utility bar */
+
+      ::selection {
+        background: rgba(169, 133, 47, 0.3);
+      }
+
+      .utilbar {
+        flex: none;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.3px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--line);
+        padding: 6px clamp(16px, 4vw, 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .utilbar a {
+        color: var(--muted);
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: color 0.15s ease, border-color 0.15s ease;
+      }
+
+      .utilbar a:hover {
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+      }
+
+      .util-left,
+      .util-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .util-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(169, 133, 47, 0.4);
+        padding: 2px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      /* --------------------------------------------------------------- hero */
+
+      .hero {
+        flex: none;
+        position: relative;
+        overflow: hidden;
+        padding: clamp(40px, 7vw, 84px) clamp(16px, 4vw, 40px) clamp(30px, 5vw, 56px);
+        text-align: center;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(560px 240px at 50% -60px, var(--act-soft), transparent 60%),
+          radial-gradient(480px 220px at 12% 30%, var(--reg-soft), transparent 55%),
+          radial-gradient(480px 220px at 88% 30%, var(--reg-soft), transparent 55%);
+        pointer-events: none;
+      }
+
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+
+      .hero .kicker {
+        justify-content: center;
+      }
+
+      .hero h1 {
+        font-size: clamp(34px, 6vw, 64px);
+        line-height: 1.06;
+        letter-spacing: -0.015em;
+        margin: 0 0 16px;
+      }
+
+      .hero-lede {
+        font-size: clamp(15px, 1.8vw, 18px);
+        line-height: 1.75;
+        color: var(--muted);
+        max-width: 60ch;
+        margin: 0 auto 24px;
+      }
+
+      .hero-meta {
+        list-style: none;
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px 22px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.35px;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        max-width: 680px;
+      }
+
+      .hero-meta strong {
+        color: var(--ink);
+        font-weight: 700;
+      }
+
+      .official-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(169, 133, 47, 0.45);
+        background: rgba(169, 133, 47, 0.06);
+        padding: 6px 16px;
+        border-radius: 999px;
+      }
+
+      .seal {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 22px;
+        border-radius: 50%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: var(--ink);
+      }
+
+      .seal::before,
+      .seal::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+      }
+
+      .seal::before {
+        border: 1.5px solid var(--line);
+      }
+
+      .seal::after {
+        inset: 6px;
+        border: 1px dashed var(--gold);
+        opacity: 0.75;
+      }
+
+      /* ------------------------------------------------------------ stage */
+
+      .stage {
+        flex: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(18px, 2.5vw, 28px);
+        padding: 0 clamp(16px, 4vw, 40px) clamp(40px, 6vw, 72px);
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .door {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: clamp(26px, 3vw, 40px);
+        text-decoration: none;
+        color: inherit;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background:
+          linear-gradient(160deg, var(--accent-soft), transparent 46%),
+          var(--bg);
+        box-shadow: 0 1px 0 rgba(127, 127, 127, 0.06), 0 12px 34px rgba(0, 0, 0, 0.05);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+
+      .door:hover,
+      .door:focus-visible {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 48px rgba(0, 0, 0, 0.14);
+        border-color: var(--accent);
+      }
+
+      .door-act {
+        --accent: var(--act);
+        --accent-soft: var(--act-soft);
+      }
+
+      .door-reg {
+        --accent: var(--reg);
+        --accent-soft: var(--reg-soft);
+      }
+
+      .door:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: -3px;
+      }
+
+      .door-inner {
+        position: relative;
+        z-index: 1;
+      }
+
+      .door-numeral {
+        position: absolute;
+        z-index: 0;
+        top: -0.16em;
+        right: -0.05em;
+        font-size: clamp(120px, 15vw, 250px);
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--accent);
+        opacity: 0.08;
+        user-select: none;
+        pointer-events: none;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+      }
+
+      .door:hover .door-numeral,
+      .door:focus-visible .door-numeral {
+        transform: translateY(-8px);
+        opacity: 0.15;
+      }
+
+      .features {
+        list-style: none;
+        margin: 22px 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 18px;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .features li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .features li::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        opacity: 0.65;
+        flex: none;
+      }
+
+      /* ---------------------------------------------------------- foot */
+
+      .foot {
+        flex: none;
+        border-top: 1px solid var(--line);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      .foot-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 28px;
+        padding: clamp(30px, 5vw, 48px) clamp(16px, 4vw, 40px) 26px;
+        text-align: left;
+      }
+
+      .foot-about p {
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 8px 0 14px;
+        max-width: 34ch;
+      }
+
+      .foot-name {
+        font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+        font-size: 19px;
+        color: var(--ink);
+        letter-spacing: 0.2px;
+      }
+
+      .foot-col h4 {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        color: var(--ink);
+        margin: 0 0 12px;
+      }
+
+      .foot-col ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        color: var(--muted);
+      }
+
+      .foot-col li strong {
+        color: var(--ink);
+      }
+
+      .foot-col a {
+        color: inherit;
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+        transition: color 0.15s ease, border-color 0.15s ease;
+      }
+
+      .foot-col a:hover {
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+      }
+
+      .foot-official {
+        display: inline-flex;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        border: 1px solid rgba(169, 133, 47, 0.4);
+        background: rgba(169, 133, 47, 0.06);
+        padding: 5px 11px;
+        border-radius: 999px;
+      }
+
+      .foot-base {
+        border-top: 1px solid var(--line);
+        padding: 14px clamp(16px, 4vw, 40px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-size: 11px;
+      }
+
+      /* ----------------------------------------------------------- reveal */
+
+      .js .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.55s ease, transform 0.55s ease;
+      }
+
+      .js .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ---------------------------------------------------------- to-top */
+
+      .to-top {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 80;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--ink);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        line-height: 1;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease,
+          color 0.15s ease, border-color 0.15s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+      }
+
+      .to-top.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+      }
+
+      .to-top:hover {
+        color: var(--gold);
+        border-color: var(--gold);
       }
 
       /* ---------------------------------------------------------- mobile */
 
       @media (max-width: 860px) {
         .stage {
-          flex-direction: column;
-          overflow-y: auto;
-        }
-
-        .divider {
-          width: auto;
-          height: 1px;
+          grid-template-columns: 1fr;
+          padding: 0 16px 32px;
         }
 
         .door {
-          min-height: 46vh;
-          padding: 32px 22px 40px;
-        }
-
-        .door-reg .door-inner {
-          margin-left: 0;
+          min-height: 0;
+          padding: 26px 22px 30px;
         }
 
         .door-numeral {
-          font-size: clamp(120px, 34vw, 200px);
-          bottom: -0.14em;
+          font-size: clamp(96px, 30vw, 180px);
+          bottom: auto;
         }
 
-        .foot {
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        .foot-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+        }
+
+        .foot-base {
           justify-content: center;
           text-align: center;
+        }
+
+        .util-tag {
+          display: none;
         }
       }
 
@@ -834,6 +1164,22 @@
       }
     </script>
 
+    <div class="utilbar">
+      <div class="util-left">
+        <span class="util-tag">
+          JKDM · Royal Malaysian Customs Department · Jabatan Kastam Diraja Malaysia
+        </span>
+        <span class="util-badge">
+          <span class="en">Official reference suite</span>
+          <span class="bm">Set rujukan rasmi</span>
+        </span>
+      </div>
+      <div class="util-right">
+        <a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my</a>
+        <a href="https://www.customs.gov.my" target="_blank" rel="noopener noreferrer">customs.gov.my</a>
+      </div>
+    </div>
+
     <header class="topbar">
       <div class="wordmark">
         <span class="mini-crest">JKDM</span>
@@ -857,7 +1203,54 @@
       </div>
     </header>
 
-    <main class="stage">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-inner">
+        <div class="seal" aria-hidden="true">JKDM</div>
+        <p class="kicker">
+          <span class="en">Official bilingual digital readers</span>
+          <span class="bm">Pembaca digital dwibahasa rasmi</span>
+        </p>
+        <h1 id="hero-title">
+          <span class="en">Customs Law Readers</span>
+          <span class="bm">Pembaca Undang-Undang Kastam</span>
+        </h1>
+        <p class="hero-lede">
+          <span class="en">
+            Authorised bilingual digital readers of the Customs Act 1967 and the Customs
+            Regulations 2019, prepared for officers of the Royal Malaysian Customs Department.
+          </span>
+          <span class="bm">
+            Pembaca digital dwibahasa yang dibenarkan bagi Akta Kastam 1967 dan Peraturan-Peraturan
+            Kastam 2019, disediakan untuk pegawai Jabatan Kastam Diraja Malaysia.
+          </span>
+        </p>
+        <ul class="hero-meta">
+          <li>
+            <strong>Act 235</strong>
+            <span>·</span>
+            <span class="en">Customs Act 1967</span>
+            <span class="bm">Akta Kastam 1967</span>
+          </li>
+          <li>
+            <strong>P.U.(A) 397/2019</strong>
+            <span>·</span>
+            <span class="en">Customs Regulations 2019</span>
+            <span class="bm">Peraturan-Peraturan Kastam 2019</span>
+          </li>
+          <li>
+            <span class="en">Consolidated to</span>
+            <span class="bm">Disatukan hingga</span>
+            <strong>31 Aug 2026</strong>
+          </li>
+        </ul>
+        <p class="official-pill">
+          <span class="en">Official use — restricted to authorized officers of JKDM</span>
+          <span class="bm">Penggunaan rasmi — terhad kepada pegawai berkuasa JKDM</span>
+        </p>
+      </div>
+    </section>
+
+    <main class="stage reveal">
       <!-- Door 1 — Customs Act 1967 -->
       <a class="door door-act" id="card-act" href="customs-act-app/">
         <span class="door-numeral" aria-hidden="true">235</span>
@@ -889,6 +1282,12 @@
             <span><strong>298</strong><span class="en">sections</span><span class="bm">seksyen</span></span>
             <span><strong>1</strong><span class="en">schedule</span><span class="bm">jadual</span></span>
           </div>
+          <ul class="features">
+            <li><span class="en">Bilingual EN / BM</span><span class="bm">Dwibahasa EN / BM</span></li>
+            <li><span class="en">Text-to-speech</span><span class="bm">Teks ke pertuturan</span></li>
+            <li><span class="en">Spotlight search</span><span class="bm">Carian sorotan</span></li>
+            <li><span class="en">Officer notes</span><span class="bm">Nota pegawai</span></li>
+          </ul>
           <span class="cta">
             <span class="en">Open the reader</span>
             <span class="bm">Buka pembaca</span>
@@ -896,10 +1295,6 @@
           </span>
         </div>
       </a>
-
-      <div class="divider" aria-hidden="true">
-        <span class="badge">JKDM</span>
-      </div>
 
       <!-- Door 2 — Customs Regulations 2019 -->
       <a class="door door-reg" id="card-reg" href="customs-reg-app/">
@@ -932,6 +1327,12 @@
             <span><strong>60</strong><span class="en">regulations</span><span class="bm">peraturan</span></span>
             <span><strong>6</strong><span class="en">schedules</span><span class="bm">jadual</span></span>
           </div>
+          <ul class="features">
+            <li><span class="en">Bilingual EN / BM</span><span class="bm">Dwibahasa EN / BM</span></li>
+            <li><span class="en">Text-to-speech</span><span class="bm">Teks ke pertuturan</span></li>
+            <li><span class="en">Spotlight search</span><span class="bm">Carian sorotan</span></li>
+            <li><span class="en">Schedule lookup</span><span class="bm">Rujukan jadual</span></li>
+          </ul>
           <span class="cta">
             <span class="en">Open the reader</span>
             <span class="bm">Buka pembaca</span>
@@ -943,7 +1344,7 @@
 
     <!-- Comparison table — Customs Act 1967 vs Customs Regulations 2019 -->
     <section class="compare" aria-labelledby="compare-title">
-      <div class="compare-head">
+      <div class="compare-head reveal">
         <p class="kicker">
           <span class="en">Side by side</span>
           <span class="bm">Bersebelahan</span>
@@ -1071,17 +1472,76 @@
     </section>
 
     <footer class="foot">
-      <span>
-        <span class="en">Digital readers prepared by</span>
-        <span class="bm">Pembaca digital disediakan oleh</span>
-        <strong>Dr.Fendi Ameen</strong>
-        · <a href="mailto:afandi.amin@customs.gov.my">afandi.amin@customs.gov.my</a>
-      </span>
-      <span>
-        <span class="en">Texts sourced from the official gazette. For reference only — consult the printed law for legal use.</span>
-        <span class="bm">Teks daripada warta rasmi. Untuk rujukan sahaja — rujuk cetakan rasmi untuk kegunaan undang-undang.</span>
-      </span>
+      <div class="foot-grid">
+        <div class="foot-col foot-about">
+          <strong class="foot-name">
+            <span class="en">Customs Law Readers</span>
+            <span class="bm">Pembaca Undang-Undang Kastam</span>
+          </strong>
+          <p>
+            <span class="en">
+              Bilingual digital readers of the Customs Act 1967 and the Customs Regulations 2019,
+              prepared for officers of the Royal Malaysian Customs Department (JKDM).
+            </span>
+            <span class="bm">
+              Pembaca digital dwibahasa bagi Akta Kastam 1967 dan Peraturan-Peraturan Kastam 2019,
+              disediakan untuk pegawai Jabatan Kastam Diraja Malaysia (JKDM).
+            </span>
+          </p>
+          <span class="foot-official">
+            <span class="en">Official use — authorized officers only</span>
+            <span class="bm">Penggunaan rasmi — pegawai berkuasa sahaja</span>
+          </span>
+        </div>
+        <div class="foot-col">
+          <h4><span class="en">Legislation</span><span class="bm">Perundangan</span></h4>
+          <ul>
+            <li><span class="en">Customs Act 1967 · Act 235</span><span class="bm">Akta Kastam 1967 · Akta 235</span></li>
+            <li><span class="en">Customs Regulations 2019 · P.U.(A) 397/2019</span><span class="bm">Peraturan Kastam 2019 · P.U.(A) 397/2019</span></li>
+            <li><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my</a></li>
+            <li><a href="https://www.customs.gov.my" target="_blank" rel="noopener noreferrer">customs.gov.my</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h4><span class="en">Readers</span><span class="bm">Pembaca</span></h4>
+          <ul>
+            <li>
+              <a id="foot-act" href="customs-act-app/">
+                <span class="en">Open Customs Act 1967 reader</span>
+                <span class="bm">Buka pembaca Akta Kastam 1967</span>
+              </a>
+            </li>
+            <li>
+              <a id="foot-reg" href="customs-reg-app/">
+                <span class="en">Open Regulations 2019 reader</span>
+                <span class="bm">Buka pembaca Peraturan 2019</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h4><span class="en">Contact</span><span class="bm">Hubungi</span></h4>
+          <ul>
+            <li><strong>Dr.Fendi Ameen</strong></li>
+            <li><a href="mailto:afandi.amin@customs.gov.my">afandi.amin@customs.gov.my</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-base">
+        <span>
+          <span class="en">© 2026 Customs Law Readers — prepared by Dr.Fendi Ameen.</span>
+          <span class="bm">© 2026 Pembaca Undang-Undang Kastam — disediakan oleh Dr.Fendi Ameen.</span>
+        </span>
+        <span>
+          <span class="en">For reference only — consult the official gazette before relying on any provision.</span>
+          <span class="bm">Untuk rujukan sahaja — rujuk warta rasmi sebelum bergantung pada mana-mana peruntukan.</span>
+        </span>
+      </div>
     </footer>
+
+    <button class="to-top" id="btn-to-top" type="button" aria-label="Back to top">
+      ↑
+    </button>
 
     <script>
       // ---------------------------------------------------------- language
@@ -1169,11 +1629,52 @@
         var portMap = {
           'card-act': 'http://localhost:5174/',
           'card-reg': 'http://localhost:5175/',
+          'foot-act': 'http://localhost:5174/',
+          'foot-reg': 'http://localhost:5175/',
         }
         for (var id in portMap) {
           var el = document.getElementById(id)
           if (el) el.href = portMap[id]
         }
+      }
+
+      // -------------------------------------------------- reveal on scroll
+      document.documentElement.classList.add('js')
+      var reducedMotion = false
+      try {
+        reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      } catch (e) {
+        /* ignore */
+      }
+      var revealEls = document.querySelectorAll('.reveal')
+      if (reducedMotion || !('IntersectionObserver' in window)) {
+        for (var r = 0; r < revealEls.length; r++) revealEls[r].classList.add('in')
+      } else {
+        var io = new IntersectionObserver(
+          function (entries) {
+            for (var j = 0; j < entries.length; j++) {
+              if (entries[j].isIntersecting) {
+                entries[j].target.classList.add('in')
+                io.unobserve(entries[j].target)
+              }
+            }
+          },
+          { threshold: 0.15 },
+        )
+        for (var k = 0; k < revealEls.length; k++) io.observe(revealEls[k])
+      }
+
+      // ------------------------------------------------------------- to-top
+      var toTopBtn = document.getElementById('btn-to-top')
+      if (toTopBtn) {
+        var onScroll = function () {
+          toTopBtn.classList.toggle('visible', window.scrollY > 560)
+        }
+        window.addEventListener('scroll', onScroll, { passive: true })
+        onScroll()
+        toTopBtn.addEventListener('click', function () {
+          window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' })
+        })
       }
     </script>
 

@@ -3,20 +3,24 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Customs Law Readers suite: landing page + Customs Act 1967 reader + Customs Regulations 2019 reader",
+  "description": "Customs Law Readers suite: landing page + Customs Act 1967 reader + Customs Regulations 2019 reader + Free Zones Act 1990 reader",
   "workspaces": [
     "customs-act-app",
-    "customs-reg-app"
+    "customs-reg-app",
+    "free-zones-app"
   ],
   "scripts": {
     "dev": "vite",
     "build": "node scripts/build-site.mjs",
     "dev:act": "npm run dev --prefix customs-act-app",
     "dev:reg": "npm run dev --prefix customs-reg-app",
+    "dev:fz": "npm run dev --prefix free-zones-app",
     "deploy:act": "npm run deploy --prefix customs-act-app",
     "deploy:reg": "npm run deploy --prefix customs-reg-app",
+    "deploy:fz": "npm run deploy --prefix free-zones-app",
     "gen:data:act": "npm run gen:data --prefix customs-act-app",
-    "gen:data:reg": "npm run gen:data --prefix customs-reg-app"
+    "gen:data:reg": "npm run gen:data --prefix customs-reg-app",
+    "gen:data:fz": "npm run gen:data --prefix free-zones-app"
   },
   "devDependencies": {
     "vite": "^6.0.0"

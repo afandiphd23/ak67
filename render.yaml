@@ -2,7 +2,8 @@
 #   /                  → landing page (app selector)
 #   /customs-act-app/  → Customs Act 1967 reader
 #   /customs-reg-app/  → Customs Regulations 2019 reader
-# scripts/build-site.mjs assembles all three into site/.
+#   /free-zones-app/   → Free Zones Act 1990 reader
+# scripts/build-site.mjs assembles all four into site/.
 services:
   - type: web
     name: ak67
@@ -22,6 +23,9 @@ services:
         name: Cache-Control
         value: public, max-age=31536000, immutable
       - path: /customs-reg-app/assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /free-zones-app/assets/*
         name: Cache-Control
         value: public, max-age=31536000, immutable
     # Fallback for unknown paths: serve the landing page.

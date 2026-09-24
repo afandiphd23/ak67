@@ -4,12 +4,13 @@
 //   ├── index.html              ← landing (app selector), copied as-is
 //   ├── customs-act-app/        ← built Customs Act 1967 reader (dist/)
 //   ├── customs-reg-app/        ← built Customs Regulations 2019 reader (dist/)
-//   └── free-zones-app/         ← built Free Zones Act 1990 reader (dist/)
+//   ├── free-zones-app/         ← built Free Zones Act 1990 reader (dist/)
+//   └── free-zones-reg-app/     ← built Free Zones Regulations 1991 reader (dist/)
 //
 // The landing page links to the readers via relative paths
-// (customs-act-app/, customs-reg-app/, free-zones-app/), so this layout is
-// exactly what it expects. Renders as one Render static site from a single
-// repo push.
+// (customs-act-app/, customs-reg-app/, free-zones-app/, free-zones-reg-app/),
+// so this layout is exactly what it expects. Renders as one Render static
+// site from a single repo push.
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { cp, mkdir, readdir, rm, stat } from 'node:fs/promises'
@@ -44,7 +45,7 @@ async function dirSizeKB(dir) {
 
 // 1. Install + build the three reader apps (landing needs no build step —
 //    it's a single dependency-free index.html).
-for (const app of ['customs-act-app', 'customs-reg-app', 'free-zones-app']) {
+for (const app of ['customs-act-app', 'customs-reg-app', 'free-zones-app', 'free-zones-reg-app']) {
   const dir = join(ROOT, app)
   if (!existsSync(join(dir, 'node_modules'))) run('npm install', dir)
   run('npm run build', dir)
@@ -63,10 +64,14 @@ await cp(join(ROOT, 'customs-reg-app', 'dist'), join(SITE, 'customs-reg-app'), {
 await cp(join(ROOT, 'free-zones-app', 'dist'), join(SITE, 'free-zones-app'), {
   recursive: true,
 })
+await cp(join(ROOT, 'free-zones-reg-app', 'dist'), join(SITE, 'free-zones-reg-app'), {
+  recursive: true,
+})
 
 console.log(
   `\n✓ site/ assembled — total ${await dirSizeKB(SITE)} kB, ` +
     `act ${await dirSizeKB(join(SITE, 'customs-act-app'))} kB, ` +
     `reg ${await dirSizeKB(join(SITE, 'customs-reg-app'))} kB, ` +
-    `fz ${await dirSizeKB(join(SITE, 'free-zones-app'))} kB`,
+    `fz ${await dirSizeKB(join(SITE, 'free-zones-app'))} kB, ` +
+    `fzreg ${await dirSizeKB(join(SITE, 'free-zones-reg-app'))} kB`,
 )

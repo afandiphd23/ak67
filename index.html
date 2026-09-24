@@ -48,6 +48,8 @@
         --reg-soft: rgba(30, 90, 96, 0.06);
         --fz: #a3652c;           /* free-zone bronze  */
         --fz-soft: rgba(163, 101, 44, 0.06);
+        --fzr: #4a5d23;          /* regulation olive  */
+        --fzr-soft: rgba(74, 93, 35, 0.06);
 
         --header-h: 64px;
       }
@@ -64,6 +66,8 @@
         --reg-soft: rgba(31, 100, 107, 0.08);
         --fz: #8f5a1e;
         --fz-soft: rgba(143, 90, 30, 0.08);
+        --fzr: #5a6d2e;
+        --fzr-soft: rgba(90, 109, 46, 0.08);
       }
 
       [data-theme='dark'] {
@@ -79,6 +83,8 @@
         --reg-soft: rgba(127, 184, 179, 0.07);
         --fz: #d9b06c;           /* antique brass     */
         --fz-soft: rgba(217, 176, 108, 0.07);
+        --fzr: #b5c77d;          /* soft olive        */
+        --fzr-soft: rgba(181, 199, 125, 0.07);
       }
 
       [data-theme='navy'] {
@@ -94,6 +100,8 @@
         --reg-soft: rgba(94, 234, 212, 0.08);
         --fz: #fbbf24;           /* amber             */
         --fz-soft: rgba(251, 191, 36, 0.08);
+        --fzr: #d9f99d;          /* lime              */
+        --fzr-soft: rgba(217, 249, 157, 0.08);
       }
 
       [data-theme='emerald'] {
@@ -109,6 +117,8 @@
         --reg-soft: rgba(110, 231, 183, 0.08);
         --fz: #f2c66d;           /* warm gold         */
         --fz-soft: rgba(242, 198, 109, 0.08);
+        --fzr: #d4e09b;          /* pale olive        */
+        --fzr-soft: rgba(212, 224, 155, 0.08);
       }
 
       * {
@@ -549,6 +559,12 @@
         }
       }
 
+      @media (max-width: 640px) {
+        .stage {
+          grid-template-columns: 1fr;
+        }
+      }
+
       .door {
         position: relative;
         display: flex;
@@ -587,6 +603,11 @@
       .door-fz {
         --accent: var(--fz);
         --accent-soft: var(--fz-soft);
+      }
+
+      .door-fzr {
+        --accent: var(--fzr);
+        --accent-soft: var(--fzr-soft);
       }
 
       .door:focus-visible {
@@ -897,6 +918,7 @@
       .compare-table thead th.col-act { color: var(--act); }
       .compare-table thead th.col-reg { color: var(--reg); }
       .compare-table thead th.col-fz { color: var(--fz); }
+      .compare-table thead th.col-fzr { color: var(--fzr); }
 
       .compare-table td:first-child,
       .compare-table th:first-child {
@@ -1239,13 +1261,13 @@
         <p class="hero-lede">
           <span class="en">
             Authorised bilingual digital readers of the Customs Act 1967, the Customs
-            Regulations 2019 and the Free Zones Act 1990, prepared for officers of the Royal
-            Malaysian Customs Department.
+            Regulations 2019, the Free Zones Act 1990 and the Free Zones Regulations 1991,
+            prepared for officers of the Royal Malaysian Customs Department.
           </span>
           <span class="bm">
             Pembaca digital dwibahasa yang dibenarkan bagi Akta Kastam 1967, Peraturan-Peraturan
-            Kastam 2019 dan Akta Zon Bebas 1990, disediakan untuk pegawai Jabatan Kastam Diraja
-            Malaysia.
+            Kastam 2019, Akta Zon Bebas 1990 dan Peraturan-Peraturan Zon Bebas 1991, disediakan
+            untuk pegawai Jabatan Kastam Diraja Malaysia.
           </span>
         </p>
         <ul class="hero-meta">
@@ -1266,6 +1288,12 @@
             <span>·</span>
             <span class="en">Free Zones Act 1990</span>
             <span class="bm">Akta Zon Bebas 1990</span>
+          </li>
+          <li>
+            <strong>P.U. (B) 455/1991</strong>
+            <span>·</span>
+            <span class="en">Free Zones Regulations 1991</span>
+            <span class="bm">Peraturan-Peraturan Zon Bebas 1991</span>
           </li>
           <li>
             <span class="en">Consolidated to</span>
@@ -1415,6 +1443,51 @@
           </span>
         </div>
       </a>
+
+      <!-- Door 4 — Free Zones Regulations 1991 -->
+      <a class="door door-fzr" id="card-fzreg" href="free-zones-reg-app/">
+        <span class="door-numeral" aria-hidden="true">455</span>
+        <div class="door-inner">
+          <p class="kicker">
+            <span class="en">Subsidiary legislation</span>
+            <span class="bm">Perundangan subsidiari</span>
+          </p>
+          <h1>
+            <span class="en">Free Zones Regulations 1991</span>
+            <span class="bm">Peraturan-Peraturan Zon Bebas 1991</span>
+          </h1>
+          <p class="citation">
+            <span class="en">P.U. (B) 455/1991 · under the Free Zones Act 1990</span>
+            <span class="bm">P.U. (B) 455/1991 · di bawah Akta Zon Bebas 1990</span>
+          </p>
+          <p class="lede">
+            <span class="en">
+              Regulations made under section 47 of the Act — free zone administration, movement of
+              goods, declarations, permits, and the prescribed JKDM forms.
+            </span>
+            <span class="bm">
+              Peraturan yang dibuat di bawah seksyen 47 Akta — pentadbiran zon bebas, pergerakan
+              barang-barang, perisytiharan, permit, dan borang-borang JKDM yang ditetapkan.
+            </span>
+          </p>
+          <div class="stats">
+            <span><strong>4</strong><span class="en">parts</span><span class="bm">bahagian</span></span>
+            <span><strong>39</strong><span class="en">regulations</span><span class="bm">peraturan</span></span>
+            <span><strong>3</strong><span class="en">schedules</span><span class="bm">jadual</span></span>
+          </div>
+          <ul class="features">
+            <li><span class="en">Gazette Bahasa Melayu</span><span class="bm">Warta Bahasa Melayu</span></li>
+            <li><span class="en">Text-to-speech</span><span class="bm">Teks ke pertuturan</span></li>
+            <li><span class="en">Spotlight search</span><span class="bm">Carian sorotan</span></li>
+            <li><span class="en">Form lookup (FZ 1–6)</span><span class="bm">Rujukan borang (FZ 1–6)</span></li>
+          </ul>
+          <span class="cta">
+            <span class="en">Open the reader</span>
+            <span class="bm">Buka pembaca</span>
+            <span class="ring">→</span>
+          </span>
+        </div>
+      </a>
     </main>
 
     <!-- Comparison table — Customs Act 1967 vs Customs Regulations 2019 -->
@@ -1429,8 +1502,8 @@
           <span class="bm">Sekilas pandang</span>
         </h2>
         <p class="compare-sub">
-          <span class="en">The three instruments compared — status, history, and where to find the official texts.</span>
-          <span class="bm">Ketiga-tiga instrumen dibandingkan — status, sejarah, dan lokasi teks rasmi.</span>
+          <span class="en">The four instruments compared — status, history, and where to find the official texts.</span>
+          <span class="bm">Keempat-empat instrumen dibandingkan — status, sejarah, dan lokasi teks rasmi.</span>
         </p>
       </div>
       <div class="compare-wrap">
@@ -1441,6 +1514,7 @@
               <th scope="col" class="col-act">Customs Act 1967</th>
               <th scope="col" class="col-reg">Customs Regulations 2019</th>
               <th scope="col" class="col-fz">Free Zones Act 1990</th>
+              <th scope="col" class="col-fzr">Free Zones Regulations 1991</th>
             </tr>
           </thead>
           <tbody>
@@ -1452,6 +1526,7 @@
               </td>
               <td>P.U.(A) 397/2019</td>
               <td>Act 438</td>
+              <td>P.U. (B) 455/1991</td>
             </tr>
             <tr>
               <td><span class="en">Short title</span><span class="bm">Tajuk pendek</span></td>
@@ -1467,6 +1542,10 @@
                 <span class="en">Free Zones Act 1990 / Akta Zon Bebas 1990</span>
                 <span class="bm">Akta Zon Bebas 1990 / Free Zones Act 1990</span>
               </td>
+              <td>
+                <span class="en">Free Zones Regulations 1991 / Peraturan-Peraturan Zon Bebas 1991</span>
+                <span class="bm">Peraturan-Peraturan Zon Bebas 1991 / Free Zones Regulations 1991</span>
+              </td>
             </tr>
             <tr>
               <td><span class="en">Enabling authority</span><span class="bm">Kuasa membolehkan</span></td>
@@ -1476,6 +1555,10 @@
                 <span class="bm">Dibuat di bawah seksyen 142 Akta 235</span>
               </td>
               <td><span class="en">—</span><span class="bm">—</span></td>
+              <td>
+                <span class="en">Made under s.47 of Act 438</span>
+                <span class="bm">Dibuat di bawah seksyen 47 Akta 438</span>
+              </td>
             </tr>
             <tr>
               <td><span class="en">Commencement</span><span class="bm">Mula berkuat kuasa</span></td>
@@ -1491,6 +1574,10 @@
                 <span class="en">5 September 1991 (P.U. (B) 455/1991)</span>
                 <span class="bm">5 September 1991 (P.U. (B) 455/1991)</span>
               </td>
+              <td>
+                <span class="en">5 September 1991</span>
+                <span class="bm">5 September 1991</span>
+              </td>
             </tr>
             <tr>
               <td><span class="en">Total sections</span><span class="bm">Jumlah seksyen</span></td>
@@ -1502,6 +1589,10 @@
               <td>
                 <span class="en">67 sections + 3 Schedules</span>
                 <span class="bm">67 seksyen + 3 Jadual</span>
+              </td>
+              <td>
+                <span class="en">39 regulations + 3 Schedules</span>
+                <span class="bm">39 peraturan + 3 Jadual</span>
               </td>
             </tr>
             <tr>
@@ -1518,6 +1609,10 @@
                 <span class="en">15 December 2025 (P.U. (B) 451/2025)</span>
                 <span class="bm">15 Disember 2025 (P.U. (B) 451/2025)</span>
               </td>
+              <td>
+                <span class="en">January 2011 print</span>
+                <span class="bm">Cetakan Januari 2011</span>
+              </td>
             </tr>
             <tr>
               <td><span class="en">Amendments in force</span><span class="bm">Pindaan berkuat kuasa</span></td>
@@ -1530,18 +1625,21 @@
                 <span class="en">Up to P.U. (B) 451/2025</span>
                 <span class="bm">Hingga P.U. (B) 451/2025</span>
               </td>
+              <td><span class="en">—</span><span class="bm">—</span></td>
             </tr>
             <tr>
               <td><span class="en">English PDF</span><span class="bm">PDF Inggeris</span></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 235</a></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — P.U.(A) 397/2019 EN</a></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 438 EN</a></td>
+              <td><span class="en">— (BM gazette only)</span><span class="bm">— (warta BM sahaja)</span></td>
             </tr>
             <tr>
               <td><span class="en">Malay PDF</span><span class="bm">PDF Melayu</span></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 235 BM</a></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — P.U.(A) 397/2019 BM</a></td>
               <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 438 BM</a></td>
+              <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — P.U. (B) 455/1991</a></td>
             </tr>
             <tr>
               <td><span class="en">RMCD reference</span><span class="bm">Rujukan JKDM</span></td>
@@ -1554,9 +1652,17 @@
                 <span class="en">Same portal</span>
                 <span class="bm">Portal yang sama</span>
               </td>
+              <td>
+                <span class="en">Same portal</span>
+                <span class="bm">Portal yang sama</span>
+              </td>
             </tr>
             <tr>
               <td><span class="en">Source</span><span class="bm">Sumber</span></td>
+              <td>
+                <span class="en">Attorney General's Chambers — lom.agc.gov.my</span>
+                <span class="bm">Jabatan Peguam Negara — lom.agc.gov.my</span>
+              </td>
               <td>
                 <span class="en">Attorney General's Chambers — lom.agc.gov.my</span>
                 <span class="bm">Jabatan Peguam Negara — lom.agc.gov.my</span>
@@ -1588,12 +1694,14 @@
           </strong>
           <p>
             <span class="en">
-              Bilingual digital readers of the Customs Act 1967 and the Customs Regulations 2019,
-              prepared for officers of the Royal Malaysian Customs Department (JKDM).
+              Bilingual digital readers of the Customs Act 1967, the Customs Regulations 2019, the
+              Free Zones Act 1990 and the Free Zones Regulations 1991, prepared for officers of the
+              Royal Malaysian Customs Department (JKDM).
             </span>
             <span class="bm">
-              Pembaca digital dwibahasa bagi Akta Kastam 1967 dan Peraturan-Peraturan Kastam 2019,
-              disediakan untuk pegawai Jabatan Kastam Diraja Malaysia (JKDM).
+              Pembaca digital dwibahasa bagi Akta Kastam 1967, Peraturan-Peraturan Kastam 2019,
+              Akta Zon Bebas 1990 dan Peraturan-Peraturan Zon Bebas 1991, disediakan untuk pegawai
+              Jabatan Kastam Diraja Malaysia (JKDM).
             </span>
           </p>
           <span class="foot-official">
@@ -1606,6 +1714,8 @@
           <ul>
             <li><span class="en">Customs Act 1967 · Act 235</span><span class="bm">Akta Kastam 1967 · Akta 235</span></li>
             <li><span class="en">Customs Regulations 2019 · P.U.(A) 397/2019</span><span class="bm">Peraturan Kastam 2019 · P.U.(A) 397/2019</span></li>
+            <li><span class="en">Free Zones Act 1990 · Act 438</span><span class="bm">Akta Zon Bebas 1990 · Akta 438</span></li>
+            <li><span class="en">Free Zones Regulations 1991 · P.U. (B) 455/1991</span><span class="bm">Peraturan Zon Bebas 1991 · P.U. (B) 455/1991</span></li>
             <li><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my</a></li>
             <li><a href="https://www.customs.gov.my" target="_blank" rel="noopener noreferrer">customs.gov.my</a></li>
           </ul>
@@ -1629,6 +1739,12 @@
               <a id="foot-fz" href="free-zones-app/">
                 <span class="en">Open Free Zones Act 1990 reader</span>
                 <span class="bm">Buka pembaca Akta Zon Bebas 1990</span>
+              </a>
+            </li>
+            <li>
+              <a id="foot-fzreg" href="free-zones-reg-app/">
+                <span class="en">Open Free Zones Regulations 1991 reader</span>
+                <span class="bm">Buka pembaca Peraturan-Peraturan Zon Bebas 1991</span>
               </a>
             </li>
           </ul>
@@ -1744,9 +1860,11 @@
           'card-act': 'http://localhost:5174/',
           'card-reg': 'http://localhost:5175/',
           'card-fz': 'http://localhost:5176/',
+          'card-fzreg': 'http://localhost:5177/',
           'foot-act': 'http://localhost:5174/',
           'foot-reg': 'http://localhost:5175/',
           'foot-fz': 'http://localhost:5176/',
+          'foot-fzreg': 'http://localhost:5177/',
         }
         for (var id in portMap) {
           var el = document.getElementById(id)

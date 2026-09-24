@@ -480,6 +480,108 @@
         }
       }
 
+      /* ------------------------------------------------ comparison table */
+
+      .compare {
+        border-top: 1px solid var(--line);
+        padding: clamp(32px, 5vw, 56px) clamp(16px, 4vw, 40px) clamp(40px, 6vw, 72px);
+      }
+
+      .compare-head {
+        max-width: 1080px;
+        margin: 0 auto 18px;
+      }
+
+      .compare-head .kicker {
+        margin-bottom: 10px;
+      }
+
+      .compare h2 {
+        font-size: clamp(20px, 2.6vw, 30px);
+        line-height: 1.2;
+        margin: 0 0 6px;
+        color: var(--ink);
+      }
+
+      .compare-sub {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .compare-wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        overflow-x: auto;
+      }
+
+      .compare-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .compare-table th,
+      .compare-table td {
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .compare-table thead th {
+        font-size: 11.5px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--ink);
+        background: rgba(127, 127, 127, 0.06);
+      }
+
+      /* Column accents match the door colours above. */
+      .compare-table thead th.col-act { color: var(--act); }
+      .compare-table thead th.col-reg { color: var(--reg); }
+
+      .compare-table td:first-child,
+      .compare-table th:first-child {
+        font-weight: 700;
+        color: var(--muted);
+        font-size: 11.5px;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        white-space: nowrap;
+        background: rgba(127, 127, 127, 0.04);
+      }
+
+      .compare-table td {
+        color: var(--ink);
+        min-width: 240px;
+      }
+
+      .compare-table a {
+        color: var(--gold);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(169, 133, 47, 0.4);
+        overflow-wrap: anywhere;
+      }
+
+      .compare-table a:hover {
+        border-bottom-color: var(--gold);
+      }
+
+      .compare-note {
+        max-width: 1080px;
+        margin: 12px auto 0;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        font-size: 11.5px;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+
       /* -------------------------------------------------------- auth gate */
       .auth-gate-overlay {
         position: fixed;
@@ -839,6 +941,135 @@
       </a>
     </main>
 
+    <!-- Comparison table — Customs Act 1967 vs Customs Regulations 2019 -->
+    <section class="compare" aria-labelledby="compare-title">
+      <div class="compare-head">
+        <p class="kicker">
+          <span class="en">Side by side</span>
+          <span class="bm">Bersebelahan</span>
+        </p>
+        <h2 id="compare-title">
+          <span class="en">At a glance</span>
+          <span class="bm">Sekilas pandang</span>
+        </h2>
+        <p class="compare-sub">
+          <span class="en">The two instruments compared — status, history, and where to find the official texts.</span>
+          <span class="bm">Kedua-dua instrumen dibandingkan — status, sejarah, dan lokasi teks rasmi.</span>
+        </p>
+      </div>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th scope="col"><span class="en">Item</span><span class="bm">Perkara</span></th>
+              <th scope="col" class="col-act">Customs Act 1967</th>
+              <th scope="col" class="col-reg">Customs Regulations 2019</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="en">Reference</span><span class="bm">Rujukan</span></td>
+              <td>
+                <span class="en">Act 235</span>
+                <span class="bm">Akta 235</span>
+              </td>
+              <td>P.U.(A) 397/2019</td>
+            </tr>
+            <tr>
+              <td><span class="en">Short title</span><span class="bm">Tajuk pendek</span></td>
+              <td>
+                <span class="en">Customs Act 1967 / Akta Kastam 1967</span>
+                <span class="bm">Akta Kastam 1967 / Customs Act 1967</span>
+              </td>
+              <td>
+                <span class="en">Customs Regulations 2019 / Peraturan-Peraturan Kastam 2019</span>
+                <span class="bm">Peraturan-Peraturan Kastam 2019 / Customs Regulations 2019</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="en">Enabling authority</span><span class="bm">Kuasa membolehkan</span></td>
+              <td><span class="en">—</span><span class="bm">—</span></td>
+              <td>
+                <span class="en">Made under s.142 of Act 235</span>
+                <span class="bm">Dibuat di bawah seksyen 142 Akta 235</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="en">Commencement</span><span class="bm">Mula berkuat kuasa</span></td>
+              <td>
+                <span class="en">1967 (Revised 1980; consolidated 30 Dec 2023)</span>
+                <span class="bm">1967 (Disemak 1980; disatukan 30 Dis 2023)</span>
+              </td>
+              <td>
+                <span class="en">1 January 2020</span>
+                <span class="bm">1 Januari 2020</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="en">Total sections</span><span class="bm">Jumlah seksyen</span></td>
+              <td>
+                <span class="en">169 sections + 1 Schedule</span>
+                <span class="bm">169 seksyen + 1 Jadual</span>
+              </td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><span class="en">Latest consolidation</span><span class="bm">Penyatuan terkini</span></td>
+              <td>
+                <span class="en">30 December 2023</span>
+                <span class="bm">30 Disember 2023</span>
+              </td>
+              <td>
+                <span class="en">Includes up to P.U.(A) 310/2026 (31 Aug 2026)</span>
+                <span class="bm">Termasuk sehingga P.U.(A) 310/2026 (31 Ogo 2026)</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="en">Amendments in force</span><span class="bm">Pindaan berkuat kuasa</span></td>
+              <td>
+                <span class="en">Up to Act A1715 (2024)</span>
+                <span class="bm">Hingga Akta A1715 (2024)</span>
+              </td>
+              <td>P.U.(A) 87/2026, 128/2026, 310/2026</td>
+            </tr>
+            <tr>
+              <td><span class="en">English PDF</span><span class="bm">PDF Inggeris</span></td>
+              <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 235</a></td>
+              <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — P.U.(A) 397/2019 EN</a></td>
+            </tr>
+            <tr>
+              <td><span class="en">Malay PDF</span><span class="bm">PDF Melayu</span></td>
+              <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — Act 235 BM</a></td>
+              <td><a href="https://lom.agc.gov.my" target="_blank" rel="noopener noreferrer">lom.agc.gov.my — P.U.(A) 397/2019 BM</a></td>
+            </tr>
+            <tr>
+              <td><span class="en">RMCD reference</span><span class="bm">Rujukan JKDM</span></td>
+              <td><a href="https://www.customs.gov.my" target="_blank" rel="noopener noreferrer">customs.gov.my — Legislation</a></td>
+              <td>
+                <span class="en">Same portal</span>
+                <span class="bm">Portal yang sama</span>
+              </td>
+            </tr>
+            <tr>
+              <td><span class="en">Source</span><span class="bm">Sumber</span></td>
+              <td>
+                <span class="en">Attorney General's Chambers — lom.agc.gov.my</span>
+                <span class="bm">Jabatan Peguam Negara — lom.agc.gov.my</span>
+              </td>
+              <td>
+                <span class="en">Attorney General's Chambers — lom.agc.gov.my</span>
+                <span class="bm">Jabatan Peguam Negara — lom.agc.gov.my</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="compare-note">
+        <span class="en">Consolidation and amendment details as reflected in these readers — always confirm against the official gazette before relying on them.</span>
+        <span class="bm">Butiran penyatuan dan pindaan seperti yang dipaparkan dalam pembaca ini — sentiasa sahkan dengan warta rasmi sebelum bergantung padanya.</span>
+      </p>
+    </section>
+
     <footer class="foot">
       <span>
         <span class="en">Digital readers prepared by</span>
@@ -939,7 +1170,12 @@
           'card-act': 'http://localhost:5174/',
           'card-reg': 'http://localhost:5175/',
         }
+        for (var id in portMap) {
+          var el = document.getElementById(id)
+          if (el) el.href = portMap[id]
+        }
       }
+    </script>
 
     <!-- Auth Gate Modal -->
     <div class="auth-gate-overlay" id="auth-gate-modal">

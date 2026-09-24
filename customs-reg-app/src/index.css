@@ -1839,3 +1839,163 @@ body {
   white-space: pre-wrap;
 }
 
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.officer-notes-preview {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+
+/* ---------------------------------------------------------- highlights */
+
+.hl-text {
+  position: relative;
+}
+
+.hl-mark {
+  background: transparent;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0.5px 0;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.hl-yellow { background: rgba(247, 215, 74, 0.45); }
+.hl-green { background: rgba(143, 214, 148, 0.4); }
+.hl-blue { background: rgba(143, 188, 217, 0.4); }
+.hl-pink { background: rgba(232, 161, 182, 0.4); }
+
+[data-theme='dark'] .hl-yellow,
+[data-theme='navy'] .hl-yellow,
+[data-theme='emerald'] .hl-yellow { background: rgba(247, 215, 74, 0.28); }
+[data-theme='dark'] .hl-green,
+[data-theme='navy'] .hl-green,
+[data-theme='emerald'] .hl-green { background: rgba(143, 214, 148, 0.24); }
+[data-theme='dark'] .hl-blue,
+[data-theme='navy'] .hl-blue,
+[data-theme='emerald'] .hl-blue { background: rgba(143, 188, 217, 0.26); }
+[data-theme='dark'] .hl-pink,
+[data-theme='navy'] .hl-pink,
+[data-theme='emerald'] .hl-pink { background: rgba(232, 161, 182, 0.26); }
+
+/* Selection color popup */
+.hl-popup {
+  position: fixed;
+  z-index: 300;
+  transform: translate(-50%, -100%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+}
+
+.hl-color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(127, 127, 127, 0.35);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.hl-color-btn:hover {
+  transform: scale(1.18);
+  border-color: var(--ink);
+}
+
+.hl-color-btn.active {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--bg);
+}
+
+.hl-remove-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hl-remove-btn:hover {
+  color: var(--act, #a33);
+}
+
+/* Sidebar panel */
+.hl-group {
+  list-style: none;
+}
+
+.hl-group-head {
+  width: 100%;
+  border-bottom: 1px dashed var(--line);
+  margin-bottom: 4px;
+}
+
+.hl-items {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.hl-item .hl-mark {
+  flex: 1;
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.hl-item-btn {
+  all: unset;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+
+.hl-item-btn:hover {
+  text-decoration: underline;
+}
+
+@media print {
+  .hl-popup,
+  .side-tabs .badge,
+  button.side-tab[title]:not([title='Bookmarks']):not([title='Tanda Buku']) {
+    display: none !important;
+  }
+  .hl-mark {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

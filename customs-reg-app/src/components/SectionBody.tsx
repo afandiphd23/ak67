@@ -1,7 +1,7 @@
 import type { FlatRegulation } from '../types'
 import type { Block, QuoteBlock } from '../types'
 import Annotation from './Annotation'
-import { TextWithXrefs } from './TextWithXrefs'
+import { HighlightableText } from './HighlightableText'
 import { UI, type Lang } from '../i18n'
 
 export function SectionBody({ section, lang }: { section: FlatRegulation; lang: Lang }) {
@@ -9,7 +9,7 @@ export function SectionBody({ section, lang }: { section: FlatRegulation; lang: 
   return (
     <div className="section-body">
       {section.content.map((block, i) => (
-        <BlockView key={i} block={block} />
+        <BlockView key={i} block={block} sectionId={section.id} />
       ))}
       <p className="print-footer">{t.printFooter}</p>
       <p className="print-footer">{t.printDisclaimer}</p>
@@ -17,30 +17,30 @@ export function SectionBody({ section, lang }: { section: FlatRegulation; lang: 
   )
 }
 
-export function BlockView({ block }: { block: Block }) {
+export function BlockView({ block, sectionId }: { block: Block; sectionId: string }) {
   if (block.kind === 'quote') {
-    return <QuoteEntry block={block as QuoteBlock} />
+    return <QuoteEntry block={block as QuoteBlock} sectionId={sectionId} />
   }
   return (
     <p className={block.kind === 'item' ? 'item' : 'para'}>
-      <TextWithXrefs text={block.text} />
+      <HighlightableText text={block.text} sectionId={sectionId} />
       {block.annotation && <Annotation text={block.annotation} />}
     </p>
   )
 }
 
-function QuoteEntry({ block }: { block: QuoteBlock }) {
+function QuoteEntry({ block, sectionId }: { block: QuoteBlock; sectionId: string }) {
   return (
     <div className="quote-entry">
       <p className="quote-term">
-        &ldquo;<TextWithXrefs text={block.term} /> {block.text}
+        &ldquo;<HighlightableText text={block.term} sectionId={sectionId} /> {block.text}
         {block.annotation && <Annotation text={block.annotation} />}
       </p>
       {block.items.length > 0 && (
         <div className="quote-items">
           {block.items.map((it, i) => (
             <p key={i} className="item">
-              <TextWithXrefs text={it} />
+              <HighlightableText text={it} sectionId={sectionId} />
             </p>
           ))}
         </div>

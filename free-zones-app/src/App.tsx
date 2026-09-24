@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import act, { allSections, findSection, localized, partTitleOf, searchSections } from './data'
 import type { FlatSection } from './data'
 import { SectionBody } from './components/SectionBody'
@@ -7,10 +7,23 @@ import { LangProvider, useLang, UI, type Lang } from './i18n'
 import { ThemeProvider, useTheme } from './theme'
 import { useBookmarks, useTextSize, useTrackSection } from './hooks'
 
+import { useHighlights } from './highlights'
 import { AuthProvider, AuthGate, useAuth } from './auth'
 import { AudioPlayer } from './components/AudioPlayer'
 import { SpotlightSearch } from './components/SpotlightSearch'
 import { OfficerNotes } from './components/OfficerNotes'
+import {
+  HighlightProvider,
+  makeHighlightsHook,
+} from './highlights'
+import { HighlightsPanel } from './components/HighlightsPanel'
+
+const useHighlightsState = makeHighlightsHook('free-zones-highlights')
+
+function HighlightsRoot({ children }: { children: ReactNode }) {
+  const value = useHighlightsState()
+  return <HighlightProvider value={value}>{children}</HighlightProvider>
+}
 
 export default function App() {
   return (
@@ -18,7 +31,9 @@ export default function App() {
       <LangProvider>
         <AuthProvider>
           <AuthGate>
-            <Shell />
+            <HighlightsRoot>
+              <Shell />
+            </HighlightsRoot>
           </AuthGate>
         </AuthProvider>
       </LangProvider>
@@ -26,7 +41,7 @@ export default function App() {
   )
 }
 
-type SideMode = 'toc' | 'bookmarks'
+type SideMode = 'toc' | 'bookmarks' | 'highlights'
 
 /** The two kinds of view the reader can be on, each with a shareable URL. */
 type View = { kind: 'section'; id: string } | { kind: 'schedules' }
@@ -121,6 +136,7 @@ function Shell() {
   const searchRef = useRef<HTMLInputElement>(null)
   const results = useMemo(() => searchSections(query), [query])
   const bookmarks = useBookmarks()
+  const highlights = useHighlights()
   const textSize = useTextSize()
 
   const selectedId = view?.kind === 'section' ? view.id : null
@@ -334,6 +350,18 @@ function Shell() {
             {t.bookmarksTab}
             {bookmarks.ids.length > 0 && <span className="badge">{bookmarks.ids.length}</span>}
           </button>
+          <button
+            className={`side-tab${sideMode === 'highlights' ? ' active' : ''}`}
+            onClick={() => setSideMode('highlights')}
+            role="tab"
+            aria-selected={sideMode === 'highlights'}
+            title={t.highlightsTitle}
+          >
+            {t.highlightsTab}
+            {highlights.all.length > 0 && (
+              <span className="badge">{t.highlightsBadge(highlights.all.length)}</span>
+            )}
+          </button>
         </div>
 
         <nav className="toc">
@@ -341,6 +369,8 @@ function Shell() {
             <SearchResults results={results} query={query} onOpen={openSection} />
           ) : sideMode === 'bookmarks' ? (
             <BookmarksList bookmarks={bookmarks} onOpen={openSection} />
+          ) : sideMode === 'highlights' ? (
+            <HighlightsPanel onOpen={openSection} findSection={findSection} />
           ) : (
             <>
               {act.parts.map((part) => (
@@ -595,13 +625,6 @@ function SectionView({
     onShowToast(lang === 'bm' ? 'Petikan undang-undang disalin!' : 'Legal citation copied!')
   }, [section.number, loc.heading, onShowToast, lang])
 
-  const copyMarkdown = useCallback(() => {
-    const title = lang === 'bm' ? 'Akta Zon Bebas 1990 (Akta 438)' : 'Free Zones Act 1990 (Act 438)'
-    const md = `## ${t.secWord} ${section.number}: ${loc.heading}\n\n*${title}*\n\n${plainText}`
-    navigator.clipboard?.writeText(md).catch(() => {})
-    onShowToast(lang === 'bm' ? 'Teks Markdown disalin!' : 'Markdown copied!')
-  }, [section.number, loc.heading, plainText, onShowToast, lang, t.secWord])
-
   return (
     <article className="section-view">
       <div className="section-meta-row">
@@ -633,13 +656,6 @@ function SectionView({
             title={lang === 'bm' ? 'Salin petikan undang-undang' : 'Copy legal citation'}
           >
             📋 {lang === 'bm' ? 'Petikan' : 'Cite'}
-          </button>
-          <button
-            className="tool-btn"
-            onClick={copyMarkdown}
-            title={lang === 'bm' ? 'Salin teks Markdown' : 'Copy clean Markdown'}
-          >
-            📄 MD
           </button>
           <button
             className={`star-btn${bookmarked ? ' on' : ''}`}
